@@ -1,0 +1,894 @@
+#psql: select * from arrests ; 
+#intellij: "select * from arrests ; "
+
+
+entityDefinitions: 
+  arrestedperson: 
+    fqn: "general.person"
+    entitySetName: "GuilfordArrestees"
+    propertyDefinitions:
+      nc.SubjectIdentification:
+        type: "nc.SubjectIdentification"
+        column: "name_id"
+      nc.PersonGivenName:
+        type: "nc.PersonGivenName"
+        column: "firstname"
+      nc.PersonMiddleName:
+        type: "nc.PersonMiddleName"
+        column: "middlename"
+      nc.PersonSurName:
+        type: "nc.PersonSurName"
+        column: "lastname"
+      nc.PersonBirthDate:
+        type: "nc.PersonBirthDate"
+        column: dob
+        transforms:
+        - !<transforms.DateTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.S", "yyyy-MM-dd'T'HH:mm:ss'Z'", "yyyy-MM-dd hh:mm:ss a", "MM/dd/yyyy hh:mm:ss a","M/dd/yyyy hh:mm:ss a","MM/d/yyyy hh:mm:ss a","M/d/yyyy hh:mm:ss a", "M/dd/yyyy hh:mm:ss a"]
+      nc.PersonSex:
+        type: "nc.PersonSex" 
+        column: "sex"
+      nc.PersonEthnicity:
+        type: "nc.PersonEthnicity"
+        column: "ethnic"
+        transforms: 
+        - !<transforms.ReplaceTransform>
+          target: ["", "N", "H", "U"]
+          goal: ["", "nonhispanic", "hispanic", ""]
+      nc.PersonEthnicity2: 
+        type: "nc.PersonEthnicity"
+        column: "race" #one of the fields in race is for hispanic
+        transforms: 
+        - !<transforms.ReplaceTransform>
+          target: ["", "B", "U", "I", "W", "A", "H", "O"]
+          goal: ["", "", "", "", "", "", "hispanic", ""]
+      nc.PersonRace:
+        type: "nc.PersonRace"
+        column: "race"
+        transforms: 
+        - !<transforms.ReplaceTransform>
+          target: ["", "B", "U", "I", "W", "A", "H", "O"]
+          goal: ["", "black", "", "amindian", "white", "asian", "", "other"]
+      ol.datasource:
+        type: "ol.datasource"
+        transforms:
+        - !<transforms.ValueTransform>
+          value: "Guilford Co. Sheriff"
+    conditions: 
+    - !<conditions.BooleanIsNullCondition>
+      column: "name_id"
+      reverse: true
+    name: "arrestedperson"
+
+  arrestedimmigrationstatus:
+    fqn: "ol.immigrationstatus"
+    entitySetName: "GuilfordImmigrationStatus"
+    propertyDefinitions:
+      ol.id: 
+        type: "ol.id"
+        column: "citizenshp"
+      ol.country: 
+        type: "ol.country"
+        column: "citizenshp"
+        transforms: 
+        - !<transforms.ReplaceTransform> 
+          target: ["AS", "GT", "EN", "MM", "CX", "CB", "US", "KR", "UG", "GU", "IQ", "VM", "CN", "AT", "GE", "UR", "VN", "TENN", "LS", "DR", "ZM", "CD", "SD", "EO", "BV", "BR", "YG", "BL", "BZ", "NP", "GER", "RH", "XX", "EL", "SB", "SA", "SM", "PK", "GC", "AA", "TT", "HD", "PR", "PI", "JM", "CJ", "AC", "VZ", "MX", "GG", "BU", "HU", "BI", "II", "ZW", "SU", "AO", "EY", "SQ", "AF", "NOEL", "SX", "LB", "HT", "UA", "PT", "TO", "CC", "NO", "NG", "SF", "LN", "JA", "TH", "IT", "IS", "YY", "EU", "PU"]
+          goal: ["Austrailia", "Guatemala", "Estonia", "Myanmar", "Central African Republic", "Cambodia", "United States", "Republic of Korea", "Uganda", "Guam", "Iraq", "Vietnam", "China", "Argentina", "Georgia", "Uruguay", "Vietnam", "", "Lesotho", "Dominican Republic", "Zambia", "Democratic Republic of Congo", "Sudan", "Estonia", "Bolivia", "Brazil", "Yugoslavia", "Bangladesh", "Belize", "Nepal", "Germany", "", "", "El Salvador", "", "Saudi Arabia", "", "Pakistan", "Greece", "Austria", "Trinidad and Tobago", "Honduras", "Puerto Rico", "Phillipines", "Jamaica", "Cayman Islands", "Antigua and Barbuda", "Venezuela", "Mexico", "Guernsey", "Bulgaria", "Hungary", "Burundi", "India", "Zimbabwe", "Sudan", "Angola", "Egypt", "Slovakia", "Afghanistan", "", "", "Liberia", "Haiti", "Ukraine", "Portugal", "Tonga", "Chile", "", "Nigeria", "South Africa", "Lebanon", "Japan", "Thailand", "Italy", "Israel", "", "Europe", "Puerto Rico"]
+      ol.status:
+        type: "ol.status"
+        column: "citizenshp"
+    conditions: 
+    - !<conditions.BooleanIsNullCondition>
+      column: "citizenshp"
+      reverse: true
+    name: "arrestedimmigrationstatus"
+
+  arrestofficer:
+    fqn: "ol.employee"
+    entitySetName: "GuilfordOfficers"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "arre_offcr"
+      publicsafety.employeeid:
+        type: "publicsafety.employeeid"
+        column: "arre_offcr"
+    conditions: 
+    - !<conditions.BooleanIsNullCondition>
+      column: "arre_offcr"
+      reverse: true
+    name: "arrestofficer"
+
+  arrest: 
+    fqn: "ol.arrest"
+    entitySetName: "GuilfordArrests"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "armainid"
+      ol.type: 
+        type: "ol.type"
+        column: "arr_type"
+      ol.arrestdatetime: 
+        type: "ol.arrestdatetime"
+        column: "arrDateTime"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.S"]
+    name: "arrest"
+
+  charge: 
+    fqn: "ol.charge"
+    entitySetName: "GuilfordCharges"
+    propertyDefinitions: 
+      ol.id: 
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["arr_chrg", "chrgdesc"]
+          separator: "_"
+      ol.level: 
+        type: "ol.level"
+        column: "fel_misd"
+      ol.description: 
+        type: "ol.description"
+        column: "chrgdesc"
+      # ol.numberofcounts: 
+      #   type: "ol.numberofcounts"
+      #   column: "chrg_seq"
+    name: "charge"
+
+  offense: 
+    fqn: "ol.offense"
+    entitySetName: "GuilfordOffenses"
+    propertyDefinitions: 
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["armainid", "arr_chrg"]
+          separator: "_"
+      ol.type: 
+        type: "ol.type"
+        column: "chargetype"
+        transforms:
+        - !<transforms.ReplaceTransform>
+          target: ["C", "", "CL", "S", "M", "F"]
+          goal: ["C", "", "CL", "S", "M", "F"] #keep this way until we know what these mean
+      ol.level:
+        type: "ol.level"
+        column: "fel_misd"
+      ol.ucr:
+        type: "ol.ucr"
+        column: "ucr_code"
+      ol.description: 
+        type: "ol.description"
+        column: "chrgdesc"
+      ol.statestatute: 
+        type: "ol.statestatute"
+        column: "arr_chrg"
+    name: "offense"
+
+  agency: 
+    fqn: "ol.agency"
+    entitySetName: "GuilfordAgencies"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "agency"
+      ol.name:
+        type: "ol.name"
+        column: "agency"
+    conditions:
+    - !<conditions.BooleanIsNullCondition>
+      column: "agency"
+      reverse: true
+    name: "agency"
+
+  incident: 
+    fqn: "ol.incident"
+    entitySetName: "GuilfordIncidents"
+    propertyDefinitions:
+      ol.id: 
+        type: "ol.id"
+        column: "case_id"
+    conditions:
+    - !<conditions.BooleanIsNullCondition>
+      column: "case_id"
+      reverse: true
+    name: "incident"
+
+  arrestlocation: 
+    fqn: "ol.location"
+    entitySetName: "GuilfordLocations"
+    propertyDefinitions: 
+      general.id: 
+        type: "general.id"
+        transforms:
+        - !<transforms.ConcatCombineTransform>
+          separator: "_"
+          transforms:
+          - !<transforms.BooleanRegexTransform>
+            column: "streetnbr"
+            pattern: "(?i)(\\bUNK\\b|\\bNo Value Supplied\\b|\\bOUT\\b)"
+            transformsIfTrue:
+            - !<transforms.ValueTransform>
+              value: null
+            transformsIfFalse: 
+            - !<transforms.ColumnTransform>
+              column: "streetnbr"
+          - !<transforms.ColumnTransform>
+            column: "apt_flr"
+          - !<transforms.BooleanRegexTransform>
+            column: "city"
+            pattern: "(?i)(\\bNo Value Supplied\\b)"
+            transformsIfTrue:
+            - !<transforms.ValueTransform>
+              value: null
+            transformsIfFalse: 
+            - !<transforms.ColumnTransform> #bunch of cities in NC where field values only given as one letter - could do replacetransform? 
+              column: "city"
+          - !<transforms.BooleanRegexTransform>
+            column: "state"
+            pattern: "(?i)(\\bNo Value Supplied\\b)"
+            transformsIfTrue:
+            - !<transforms.ValueTransform>
+              value: null
+            transformsIfFalse: 
+            - !<transforms.ColumnTransform>
+              column: "state"
+          - !<transforms.BooleanRegexTransform>
+            column: "zip"
+            pattern: "(?i)(\\bNo Value Supplied\\b|\\b`\\b|\\b0\\b|\\bNC\\b|\\b27\\b|\\bD\\b|\\b2701\\b)"
+            transformsIfTrue:
+            - !<transforms.ValueTransform>
+              value: null
+            transformsIfFalse: 
+            - !<transforms.ColumnTransform>
+              column: "zip"
+      location.street:
+        type: "location.street"
+        transforms:
+        - !<transforms.ConcatCombineTransform>
+          separator: " "
+          transforms:
+          - !<transforms.BooleanRegexTransform>
+            column: "streetnbr"
+            pattern: "(?i)(\\bUNK\\b|\\bNo Value Supplied\\b|\\bOUT\\b)"
+            transformsIfTrue:
+            - !<transforms.ValueTransform>
+              value: null
+            transformsIfFalse: 
+            - !<transforms.ColumnTransform>
+              column: "streetnbr"
+          - !<transforms.BooleanRegexTransform>
+            column: "street"
+            pattern: "(?i)(\\bUNK\\b|\\bNo Value Supplied\\b)"
+            transformsIfTrue:
+            - !<transforms.ValueTransform>
+              value: null
+            transformsIfFalse: 
+            - !<transforms.ColumnTransform>
+              column: "street"
+      location.addressline2: 
+        type: "location.addressline2"
+        column: "apt_flr"
+      location.city: 
+        type: "location.city"
+        transforms:
+        - !<transforms.BooleanRegexTransform>
+          column: "city"
+          pattern: "(?i)(\\bNo Value Supplied\\b)"
+          transformsIfTrue:
+          - !<transforms.ValueTransform>
+            value: null
+          transformsIfFalse: 
+          - !<transforms.ColumnTransform> #bunch of cities in NC where field values only given as one letter - could do replacetransform? 
+            column: "city"
+      location.state:
+        type: "location.state"
+        transforms:
+        - !<transforms.BooleanRegexTransform>
+          column: "state"
+          pattern: "(?i)(\\bNo Value Supplied\\b)"
+          transformsIfTrue:
+          - !<transforms.ValueTransform>
+            value: null
+          transformsIfFalse: 
+          - !<transforms.ColumnTransform>
+            column: "state"
+      location.zip: 
+        type: "location.zip"
+        transforms:
+        - !<transforms.BooleanRegexTransform>
+          column: "zip"
+          pattern: "(?i)(\\bNo Value Supplied\\b|\\b`\\b|\\b0\\b|\\bNC\\b|\\b27\\b|\\bD\\b|\\b2701\\b)"
+          transformsIfTrue:
+          - !<transforms.ValueTransform>
+            value: null
+          transformsIfFalse: 
+          - !<transforms.ColumnTransform>
+            column: "zip"
+      ol.locationcoordinates:
+        type: "ol.locationcoordinates"
+        transforms:
+        - !<transforms.GeographyPointTransform>
+          latTransforms:
+          - !<transforms.ConcatCombineTransform>
+            separator: ", "
+            transforms:
+            - !<transforms.BooleanRegexTransform>
+              column: "streetnbr"
+              pattern: "(?i)(\\bUNK\\b|\\bNo Value Supplied\\b|\\bOUT\\b)"
+              transformsIfTrue:
+              - !<transforms.ValueTransform>
+                value: null
+              transformsIfFalse: 
+              - !<transforms.ColumnTransform>
+                column: "streetnbr"
+            - !<transforms.BooleanRegexTransform>
+              column: "street"
+              pattern: "(?i)(\\bUNK\\b|\\bNo Value Supplied\\b)"
+              transformsIfTrue:
+              - !<transforms.ValueTransform>
+                value: null
+              transformsIfFalse: 
+              - !<transforms.ColumnTransform>
+                column: "street"
+            - !<transforms.BooleanRegexTransform>
+              column: "city"
+              pattern: "(?i)(\\bNo Value Supplied\\b)"
+              transformsIfTrue:
+              - !<transforms.ValueTransform>
+                value: null
+              transformsIfFalse: 
+              - !<transforms.ColumnTransform> #bunch of cities in NC where field values only given as one letter - could do replacetransform? 
+                column: "city"
+            - !<transforms.BooleanRegexTransform>
+              column: "state"
+              pattern: "(?i)(\\bNo Value Supplied\\b)"
+              transformsIfTrue:
+              - !<transforms.ValueTransform>
+                value: null
+              transformsIfFalse: 
+              - !<transforms.ColumnTransform>
+                column: "state"
+            - !<transforms.BooleanRegexTransform>
+              column: "zip"
+              pattern: "(?i)(\\bNo Value Supplied\\b|\\b`\\b|\\b0\\b|\\bNC\\b|\\b27\\b|\\bD\\b|\\b2701\\b)"
+              transformsIfTrue:
+              - !<transforms.ValueTransform>
+                value: null
+              transformsIfFalse: 
+              - !<transforms.ColumnTransform>
+                column: "zip"
+          - !<transforms.GeocoderTransform> 
+            addressObject: "lat"
+          lonTransforms:
+          - !<transforms.ConcatCombineTransform>
+            separator: ", "
+            transforms:
+            - !<transforms.BooleanRegexTransform>
+              column: "streetnbr"
+              pattern: "(?i)(\\bUNK\\b|\\bNo Value Supplied\\b|\\bOUT\\b)"
+              transformsIfTrue:
+              - !<transforms.ValueTransform>
+                value: null
+              transformsIfFalse: 
+              - !<transforms.ColumnTransform>
+                column: "streetnbr"
+            - !<transforms.BooleanRegexTransform>
+              column: "street"
+              pattern: "(?i)(\\bUNK\\b|\\bNo Value Supplied\\b)"
+              transformsIfTrue:
+              - !<transforms.ValueTransform>
+                value: null
+              transformsIfFalse: 
+              - !<transforms.ColumnTransform>
+                column: "street"
+            - !<transforms.BooleanRegexTransform>
+              column: "city"
+              pattern: "(?i)(\\bNo Value Supplied\\b)"
+              transformsIfTrue:
+              - !<transforms.ValueTransform>
+                value: null
+              transformsIfFalse: 
+              - !<transforms.ColumnTransform> #bunch of cities in NC where field values only given as one letter - could do replacetransform? 
+                column: "city"
+            - !<transforms.BooleanRegexTransform>
+              column: "state"
+              pattern: "(?i)(\\bNo Value Supplied\\b)"
+              transformsIfTrue:
+              - !<transforms.ValueTransform>
+                value: null
+              transformsIfFalse: 
+              - !<transforms.ColumnTransform>
+                column: "state"
+            - !<transforms.BooleanRegexTransform>
+              column: "zip"
+              pattern: "(?i)(\\bNo Value Supplied\\b|\\b`\\b|\\b0\\b|\\bNC\\b|\\b27\\b|\\bD\\b|\\b2701\\b)"
+              transformsIfTrue:
+              - !<transforms.ValueTransform>
+                value: null
+              transformsIfFalse: 
+              - !<transforms.ColumnTransform>
+                column: "zip"
+          - !<transforms.GeocoderTransform>
+            addressObject: "lon"
+    name: "arrestlocation"
+
+
+  residentlocation: 
+    fqn: "ol.location"
+    entitySetName: "GuilfordLocations"
+    propertyDefinitions: 
+      general.id: 
+        type: "general.id"
+        transforms:
+        - !<transforms.ConcatCombineTransform>
+          separator: "_"
+          transforms:
+          - !<transforms.BooleanRegexTransform>
+            column: "n_streetnbr"
+            pattern: "(?i)(\\bUNK\\b|\\bNo Value Supplied\\b)"
+            transformsIfTrue:
+            - !<transforms.ValueTransform>
+              value: null
+            transformsIfFalse: 
+            - !<transforms.ColumnTransform>
+              column: "n_streetnbr"
+          - !<transforms.BooleanRegexTransform>
+            column: "n_street"
+            pattern: "(?i)(\\bUNK\\b|\\bNo Value Supplied\\b)"
+            transformsIfTrue:
+            - !<transforms.ValueTransform>
+              value: null
+            transformsIfFalse: 
+            - !<transforms.ColumnTransform>
+              column: "n_street"
+          - !<transforms.ColumnTransform>
+            column: "n_apt_flr"
+          - !<transforms.BooleanRegexTransform>
+            column: "n_city"
+            pattern: "(?i)(\\bNo Value Supplied\\b|\\bCOUNTY:       BIRTH\\b)"
+            transformsIfTrue:
+            - !<transforms.ValueTransform>
+              value: null
+            transformsIfFalse: 
+            - !<transforms.ColumnTransform> #bunch of cities in NC where field values only given as one letter - could take them out or do replacetransform and match with zip code city? 
+              column: "n_city"
+          - !<transforms.BooleanRegexTransform>
+            column: "n_state"
+            pattern: "(?i)(\\bNo Value Supplied\\b|\\bE:\\b)"
+            transformsIfTrue:
+            - !<transforms.ValueTransform>
+              value: null
+            transformsIfFalse: 
+            - !<transforms.ColumnTransform>
+              column: "n_state"
+          - !<transforms.BooleanRegexTransform>
+            column: "n_zip"
+            pattern: "(?i)(\\bNo Value Supplied\\b|\\b0001896683\\b|\\b0\\b|\\b2\\b|\\b27\\b|\\b60\\b|\\b2701\\b)"
+            transformsIfTrue:
+            - !<transforms.ValueTransform>
+              value: null
+            transformsIfFalse: 
+            - !<transforms.ColumnTransform>
+              column: "n_zip"
+      ol.type: 
+        type: "ol.type"
+        transforms:
+        - !<transforms.BooleanContainsTransform>
+          column: "res_status"
+          string: "R"
+          transformsIfTrue:
+          - !<transforms.ValueTransform>
+            value: "Residential"
+          transformsIfFalse:
+          - !<transforms.ValueTransform>
+            value: "non-Residential"
+      location.street:
+        type: "location.street"
+        transforms:
+        - !<transforms.ConcatCombineTransform>
+          separator: " "
+          transforms:
+          - !<transforms.BooleanRegexTransform>
+            column: "n_streetnbr"
+            pattern: "(?i)(\\bUNK\\b|\\bNo Value Supplied\\b)"
+            transformsIfTrue:
+            - !<transforms.ValueTransform>
+              value: null
+            transformsIfFalse: 
+            - !<transforms.ColumnTransform>
+              column: "n_streetnbr"
+          - !<transforms.BooleanRegexTransform>
+            column: "n_street"
+            pattern: "(?i)(\\bUNK\\b|\\bNo Value Supplied\\b)"
+            transformsIfTrue:
+            - !<transforms.ValueTransform>
+              value: null
+            transformsIfFalse: 
+            - !<transforms.ColumnTransform>
+              column: "n_street"
+      location.addressline2: 
+        type: "location.addressline2"
+        column: "n_apt_flr" 
+      location.city: 
+        type: "location.city"
+        transforms:
+        - !<transforms.BooleanRegexTransform>
+          column: "n_city"
+          pattern: "(?i)(\\bNo Value Supplied\\b|\\bCOUNTY:       BIRTH\\b)"
+          transformsIfTrue:
+          - !<transforms.ValueTransform>
+            value: null
+          transformsIfFalse: 
+          - !<transforms.ColumnTransform> #bunch of cities in NC where field values only given as one letter - could take them out or do replacetransform and match with zip code city? 
+            column: "n_city"
+      location.state:
+        type: "location.state"
+        transforms:
+        - !<transforms.BooleanRegexTransform>
+          column: "n_state"
+          pattern: "(?i)(\\bNo Value Supplied\\b|\\bE:\\b)"
+          transformsIfTrue:
+          - !<transforms.ValueTransform>
+            value: null
+          transformsIfFalse: 
+          - !<transforms.ColumnTransform>
+            column: "n_state"
+      location.zip: 
+        type: "location.zip"
+        transforms:
+        - !<transforms.BooleanRegexTransform>
+          column: "n_zip"
+          pattern: "(?i)(\\bNo Value Supplied\\b|\\b0001896683\\b|\\b0\\b|\\b2\\b|\\b27\\b|\\b60\\b|\\b2701\\b)"
+          transformsIfTrue:
+          - !<transforms.ValueTransform>
+            value: null
+          transformsIfFalse: 
+          - !<transforms.ColumnTransform>
+            column: "n_zip"
+      ol.locationcoordinates:
+        type: "ol.locationcoordinates"
+        transforms:
+        - !<transforms.GeographyPointTransform>
+          latTransforms:
+          - !<transforms.ConcatCombineTransform>
+            separator: ", "
+            transforms:
+            - !<transforms.BooleanRegexTransform>
+              column: "n_streetnbr"
+              pattern: "(?i)(\\bUNK\\b|\\bNo Value Supplied\\b)"
+              transformsIfTrue:
+              - !<transforms.ValueTransform>
+                value: null
+              transformsIfFalse: 
+              - !<transforms.ColumnTransform>
+                column: "n_streetnbr"
+            - !<transforms.BooleanRegexTransform>
+              column: "n_street"
+              pattern: "(?i)(\\bUNK\\b|\\bNo Value Supplied\\b)"
+              transformsIfTrue:
+              - !<transforms.ValueTransform>
+                value: null
+              transformsIfFalse: 
+              - !<transforms.ColumnTransform>
+                column: "n_street"
+            - !<transforms.BooleanRegexTransform>
+              column: "n_city"
+              pattern: "(?i)(\\bNo Value Supplied\\b|\\bCOUNTY:       BIRTH\\b)"
+              transformsIfTrue:
+              - !<transforms.ValueTransform>
+                value: null
+              transformsIfFalse: 
+              - !<transforms.ColumnTransform> #bunch of cities in NC where field values only given as one letter - could take them out or do replacetransform and match with zip code city? 
+                column: "n_city"
+            - !<transforms.BooleanRegexTransform>
+              column: "n_state"
+              pattern: "(?i)(\\bNo Value Supplied\\b|\\bE:\\b)"
+              transformsIfTrue:
+              - !<transforms.ValueTransform>
+                value: null
+              transformsIfFalse: 
+              - !<transforms.ColumnTransform>
+                column: "n_state"
+            - !<transforms.BooleanRegexTransform>
+              column: "n_zip"
+              pattern: "(?i)(\\bNo Value Supplied\\b|\\b0001896683\\b|\\b0\\b|\\b2\\b|\\b27\\b|\\b60\\b|\\b2701\\b)"
+              transformsIfTrue:
+              - !<transforms.ValueTransform>
+                value: null
+              transformsIfFalse: 
+              - !<transforms.ColumnTransform>
+                column: "n_zip"
+          - !<transforms.GeocoderTransform> 
+            addressObject: "lat"
+          lonTransforms:
+          - !<transforms.ConcatCombineTransform>
+            separator: ", "
+            transforms:
+            - !<transforms.BooleanRegexTransform>
+              column: "n_streetnbr"
+              pattern: "(?i)(\\bUNK\\b|\\bNo Value Supplied\\b)"
+              transformsIfTrue:
+              - !<transforms.ValueTransform>
+                value: null
+              transformsIfFalse: 
+              - !<transforms.ColumnTransform>
+                column: "n_streetnbr"
+            - !<transforms.BooleanRegexTransform>
+              column: "n_street"
+              pattern: "(?i)(\\bUNK\\b|\\bNo Value Supplied\\b)"
+              transformsIfTrue:
+              - !<transforms.ValueTransform>
+                value: null
+              transformsIfFalse: 
+              - !<transforms.ColumnTransform>
+                column: "n_street"
+            - !<transforms.BooleanRegexTransform>
+              column: "n_city"
+              pattern: "(?i)(\\bNo Value Supplied\\b|\\bCOUNTY:       BIRTH\\b)"
+              transformsIfTrue:
+              - !<transforms.ValueTransform>
+                value: null
+              transformsIfFalse: 
+              - !<transforms.ColumnTransform> #bunch of cities in NC where field values only given as one letter - could take them out or do replacetransform and match with zip code city? 
+                column: "n_city"
+            - !<transforms.BooleanRegexTransform>
+              column: "n_state"
+              pattern: "(?i)(\\bNo Value Supplied\\b|\\bE:\\b)"
+              transformsIfTrue:
+              - !<transforms.ValueTransform>
+                value: null
+              transformsIfFalse: 
+              - !<transforms.ColumnTransform>
+                column: "n_state"
+            - !<transforms.BooleanRegexTransform>
+              column: "n_zip"
+              pattern: "(?i)(\\bNo Value Supplied\\b|\\b0001896683\\b|\\b0\\b|\\b2\\b|\\b27\\b|\\b60\\b|\\b2701\\b)"
+              transformsIfTrue:
+              - !<transforms.ValueTransform>
+                value: null
+              transformsIfFalse: 
+              - !<transforms.ColumnTransform>
+                column: "n_zip"
+          - !<transforms.GeocoderTransform>
+            addressObject: "lon"
+    name: "residentlocation"
+
+
+associationDefinitions:
+  involvedin1:
+    fqn: "ol.involvedin"
+    entitySetName: "GuilfordInvolvedIn"
+    src: "arrestedperson"
+    dst: "incident"
+    propertyDefinitions: 
+      ol.id: 
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["name_id", "armainid", "case_id"]
+          separator: "_"
+    name: "involvedin1"
+
+  involvedin2:
+    fqn: "ol.involvedin"
+    entitySetName: "GuilfordInvolvedIn"
+    src: "arrestofficer"
+    dst: "incident"
+    propertyDefinitions:
+      ol.id: 
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["arre_offcr", "armainid", "case_id"]
+          separator: "_"
+    name: "involvedin2"
+
+  arrestedby:
+    fqn: "ol.arrestedby"
+    entitySetName: "GuilfordArrestedBy"
+    src: "arrestedperson"
+    dst: "arrestofficer"
+    propertyDefinitions: 
+      ol.id: 
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["name_id", "arre_offcr"]
+          separator: "_"
+    name: "arrestedby"
+
+  locatedat1: 
+    fqn: "ol.locatedat"
+    entitySetName: "GuilfordLocatedAt"
+    src: "arrestedperson"
+    dst: "residentlocation"
+    propertyDefinitions:
+      general.id:
+        type: "general.id"
+        transforms:
+        - !<transforms.ConcatCombineTransform>
+          separator: "_"
+          transforms:
+          - !<transforms.BooleanRegexTransform>
+            column: "n_streetnbr"
+            pattern: "(?i)(\\bNo Value Supplied\\b)"
+            transformsIfTrue:
+            - !<transforms.ValueTransform>
+              value: null
+            transformsIfFalse:
+            - !<transforms.ColumnTransform>
+              column: "n_streetnbr"
+          - !<transforms.ColumnTransform>
+            column: "name_id"
+    name: "locatedat1"
+
+  chargedwith:
+    fqn: "ol.chargedwith"
+    entitySetName: "GuilfordChargedWith"
+    src: "arrestedperson"
+    dst: "charge"
+    propertyDefinitions:
+      ol.id: 
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["name_id", "arr_chrg", "chrgdesc"]
+          separator: "_"
+    name: "chargedwith"
+
+  subjectof: 
+    fqn: "ol.subjectof"
+    entitySetName: "GuilfordSubjectOf"
+    src: "arrestedperson"
+    dst: "arrest"
+    propertyDefinitions:
+      ol.id: 
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["name_id", "armainid"]
+          separator: "_"
+    name: "subjectof"
+
+  has:
+    fqn: "ol.has"
+    entitySetName: "GuilfordHas"
+    src: "arrestedperson"
+    dst: "arrestedimmigrationstatus"
+    propertyDefinitions: 
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["name_id", "citizenshp"]
+          separator: "_"
+    name: "has"
+
+  locatedat2:
+    fqn: "ol.location"
+    entitySetName: "GuilfordLocatedAt"
+    src: "arrest"
+    dst: "arrestlocation"
+    propertyDefinitions: 
+      general.id: 
+        type: "general.id"
+        transforms:
+        - !<transforms.ConcatCombineTransform>
+          separator: "_"
+          transforms:
+          - !<transforms.ColumnTransform>
+            column: "armainid"
+          - !<transforms.BooleanContainsTransform>
+            column: "streetnbr"
+            string: "No Value Supplied"
+            transformsIfTrue:
+            - !<transforms.ValueTransform>
+              value: null
+            transformsIfFalse:
+            - !<transforms.ColumnTransform>
+              column: "streetnbr"
+    name: "locatedat2"
+
+  involvedin3:
+    fqn: "ol.involvedin"
+    entitySetName: "GuilfordInvolvedIn"
+    src: "agency"
+    dst: "charge"
+    propertyDefinitions: 
+      ol.id: 
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["agency", "arr_chrg"]
+          separator: "_"
+    name: "involvedin3"
+
+  relatedto1:
+    fqn: "ol.relatedto"
+    entitySetName: "GuilfordRelatedTo"
+    src: "charge"
+    dst: "arrest"
+    propertyDefinitions: 
+      ol.id: 
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["armainid", "arr_chrg", "arr_type"]
+          separator: "_"
+    name: "relatedto1"
+
+  associatedwith:
+    fqn: "ol.associatedwith"
+    entitySetName: "GuilfordAssociatedWith"
+    src: "charge"
+    dst: "incident"
+    propertyDefinitions: 
+      ol.id: 
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["arr_chrg", "case_id"]
+          separator: "_"
+    name: "associatedwith"
+
+  relatedto2: 
+    fqn: "ol.relatedto"
+    entitySetName: "GuilfordRelatedTo"
+    src: "arrest"
+    dst: "incident"
+    propertyDefinitions: 
+      ol.id: 
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["armainid", "arr_type", "case_id"]
+          separator: "_"
+    name: "relatedto2"
+
+  suspectedof: 
+    fqn: "ol.suspectedof"
+    entitySetName: "GuilfordSuspectedOf"
+    src: "arrestedperson"
+    dst: "offense"
+    propertyDefinitions: 
+      ol.id: 
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["name_id", "arr_chrg"]
+          separator: "_"
+    name: "suspectedof"
+
+
+  relatedto3: 
+    fqn: "ol.relatedto"
+    entitySetName: "GuilfordRelatedTo"
+    src: "offense"
+    dst: "incident"
+    propertyDefinitions: 
+      ol.id: 
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["arr_chrg", "case_id"]
+          separator: "_"
+    name: "relatedto3"
+
+  resultsin: 
+    fqn: "ol.resultsin"
+    entitySetName: "GuilfordResultsIn"
+    src: "offense"
+    dst: "charge"
+    propertyDefinitions: 
+      ol.id: 
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["armainid", "arr_chrg", "chrgdesc"]
+          separator: "_"
+    name: "resultsin"
