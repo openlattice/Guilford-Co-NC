@@ -24,7 +24,7 @@ entityDefinitions:
         column: dob
         transforms:
         - !<transforms.DateTransform>
-          pattern: ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.S", "yyyy-MM-dd'T'HH:mm:ss'Z'", "yyyy-MM-dd hh:mm:ss a", "MM/dd/yyyy hh:mm:ss a","M/dd/yyyy hh:mm:ss a","MM/d/yyyy hh:mm:ss a","M/d/yyyy hh:mm:ss a", "M/dd/yyyy hh:mm:ss a"]
+          pattern: ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.S", "yyyy-MM-dd'T'HH:mm:ss'Z'", "yyyy-MM-dd hh:mm:ss a", "MM/dd/yyyy hh:mm:ss a","M/dd/yyyy hh:mm:ss a","MM/d/yyyy hh:mm:ss a","M/d/yyyy hh:mm:ss a", "M/d/yyyy h:mm:ss a", "M/dd/yyyy hh:mm:ss a"]
       nc.PersonSex:
         type: "nc.PersonSex" 
         column: "sex"
@@ -73,7 +73,7 @@ entityDefinitions:
         transforms: 
         - !<transforms.ReplaceTransform> 
           target: ["AS", "GT", "EN", "MM", "CX", "CB", "US", "KR", "UG", "GU", "IQ", "VM", "CN", "AT", "GE", "UR", "VN", "TENN", "LS", "DR", "ZM", "CD", "SD", "EO", "BV", "BR", "YG", "BL", "BZ", "NP", "GER", "RH", "XX", "EL", "SB", "SA", "SM", "PK", "GC", "AA", "TT", "HD", "PR", "PI", "JM", "CJ", "AC", "VZ", "MX", "GG", "BU", "HU", "BI", "II", "ZW", "SU", "AO", "EY", "SQ", "AF", "NOEL", "SX", "LB", "HT", "UA", "PT", "TO", "CC", "NO", "NG", "SF", "LN", "JA", "TH", "IT", "IS", "YY", "EU", "PU"]
-          goal: ["Austrailia", "Guatemala", "Estonia", "Myanmar", "Central African Republic", "Cambodia", "United States", "Republic of Korea", "Uganda", "Guam", "Iraq", "Vietnam", "China", "Argentina", "Georgia", "Uruguay", "Vietnam", "", "Lesotho", "Dominican Republic", "Zambia", "Democratic Republic of Congo", "Sudan", "Estonia", "Bolivia", "Brazil", "Yugoslavia", "Bangladesh", "Belize", "Nepal", "Germany", "", "", "El Salvador", "", "Saudi Arabia", "", "Pakistan", "Greece", "Austria", "Trinidad and Tobago", "Honduras", "Puerto Rico", "Phillipines", "Jamaica", "Cayman Islands", "Antigua and Barbuda", "Venezuela", "Mexico", "Guernsey", "Bulgaria", "Hungary", "Burundi", "India", "Zimbabwe", "Sudan", "Angola", "Egypt", "Slovakia", "Afghanistan", "", "", "Liberia", "Haiti", "Ukraine", "Portugal", "Tonga", "Chile", "", "Nigeria", "South Africa", "Lebanon", "Japan", "Thailand", "Italy", "Israel", "", "Europe", "Puerto Rico"]
+          goal: ["AS: Austrailia", "GT: Guatemala", "EN: Estonia", "MM: Myanmar", "CX: Central African Republic", "CB: Cambodia", "US: United States", "KR: Republic of Korea", "UG: Uganda", "GU: Guam", "IQ: Iraq", "VM: Vietnam", "CN: China", "AT: Argentina", "GE: Georgia", "UR: Uruguay", "VN: Vietnam", "", "LS: Lesotho", "DR: Dominican Republic", "ZM: Zambia", "CD: Democratic Republic of Congo", "SD: Sudan", "EO: Estonia", "BV: Bolivia", "BR: Brazil", "YG: Yugoslavia", "BL: Bangladesh", "BZ: Belize", "NP: Nepal", "GER: Germany", "", "", "EL: El Salvador", "", "SA: Saudi Arabia", "", "PK: Pakistan", "GC: Greece", "AA: Austria", "TT: Trinidad and Tobago", "HD: Honduras", "PR: Puerto Rico", "PI: Phillipines", "JM: Jamaica", "CJ: Cayman Islands", "AC: Antigua and Barbuda", "VZ: Venezuela", "MX: Mexico", "GG: Guernsey", "BU: Bulgaria", "HU: Hungary", "BI: Burundi", "II: India", "ZW: Zimbabwe", "SU: Sudan", "AO: Angola", "EY: Egypt", "SQ: Slovakia", "AF: Afghanistan", "", "", "LB: Liberia", "HT: Haiti", "UA: Ukraine", "PT: Portugal", "TO: Tonga", "CC: Chile", "", "NG: Nigeria", "SF: South Africa", "LN: Lebanon", "JA: Japan", "TH: Thailand", "IT: Italy", "IS: Israel", "", "EU: Europe", "PU: Puerto Rico"]
       ol.status:
         type: "ol.status"
         column: "citizenshp"
@@ -125,7 +125,7 @@ entityDefinitions:
         type: "ol.id"
         transforms:
         - !<transforms.ConcatTransform>
-          columns: ["arr_chrg", "chrgdesc"]
+          columns: ["arr_chrg", "chrgdesc", "fel_misd"]
           separator: "_"
       ol.level: 
         type: "ol.level"
@@ -136,6 +136,10 @@ entityDefinitions:
       # ol.numberofcounts: 
       #   type: "ol.numberofcounts"
       #   column: "chrg_seq"
+    conditions: 
+    - !<conditions.BooleanIsNullCondition>
+      column: "arr_chrg"
+      reverse: true
     name: "charge"
 
   offense: 
@@ -217,6 +221,15 @@ entityDefinitions:
             transformsIfFalse: 
             - !<transforms.ColumnTransform>
               column: "streetnbr"
+          - !<transforms.BooleanRegexTransform>
+            column: "street"
+            pattern: "(?i)(\\bUNK\\b|\\bNo Value Supplied\\b|\\bOUT\\b)"
+            transformsIfTrue:
+            - !<transforms.ValueTransform>
+              value: null
+            transformsIfFalse: 
+            - !<transforms.ColumnTransform>
+              column: "street"
           - !<transforms.ColumnTransform>
             column: "apt_flr"
           - !<transforms.BooleanRegexTransform>
@@ -315,7 +328,7 @@ entityDefinitions:
         - !<transforms.GeographyPointTransform>
           latTransforms:
           - !<transforms.ConcatCombineTransform>
-            separator: ", "
+            separator: " "
             transforms:
             - !<transforms.BooleanRegexTransform>
               column: "streetnbr"
@@ -366,7 +379,7 @@ entityDefinitions:
             addressObject: "lat"
           lonTransforms:
           - !<transforms.ConcatCombineTransform>
-            separator: ", "
+            separator: " "
             transforms:
             - !<transforms.BooleanRegexTransform>
               column: "streetnbr"
@@ -556,7 +569,7 @@ entityDefinitions:
         - !<transforms.GeographyPointTransform>
           latTransforms:
           - !<transforms.ConcatCombineTransform>
-            separator: ", "
+            separator: " "
             transforms:
             - !<transforms.BooleanRegexTransform>
               column: "n_streetnbr"
@@ -607,7 +620,7 @@ entityDefinitions:
             addressObject: "lat"
           lonTransforms:
           - !<transforms.ConcatCombineTransform>
-            separator: ", "
+            separator: " "
             transforms:
             - !<transforms.BooleanRegexTransform>
               column: "n_streetnbr"
