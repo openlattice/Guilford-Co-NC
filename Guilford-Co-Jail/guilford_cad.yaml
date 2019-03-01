@@ -1,0 +1,229 @@
+
+entityDefinitions:
+  dispatch:
+    fqn: "ol.dispatch"
+    entitySetName: "GuilfordDispatch"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "inci_id"
+      ol.caseid:
+        type: "ol.caseid"
+        column: "case_id"
+      ol.howreported:
+        type: "ol.howreported"
+        column: "callsource"
+      ol.receiveddatetime:
+        type: "ol.receiveddatetime"
+        column: "calltime"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ['yyyy-MM-dd HH:mm:ss','yyyy-MM-dd H:mm:ss.S']
+      date.completeddatetime:
+        type: "date.completeddatetime"
+        column: "timeclose"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ['yyyy-MM-dd HH:mm:ss','yyyy-MM-dd H:mm:ss.S']
+      ol.priority:
+        type: "ol.priority"
+        column: "priority"
+      ol.description:
+        type: "ol.description"
+        column: "nature"
+    name: "dispatch"
+
+  dispatch_agency:
+    fqn: "ol.agency"
+    entitySetName: "GuilfordAgencies"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "agency"
+      ol.name:
+        type: "ol.name"
+        column: "agency"
+      ol.type:
+        type: "ol.type"
+        column: "service"
+    name: "dispatch_agency"
+
+  location:
+    fqn: "ol.location"
+    entitySetName: "GuilfordLocations"
+    propertyDefinitions:
+      general.id:
+        type: "general.id"
+        transforms:
+        - !<transforms.HashTransform>
+          columns: ["street", "city", "geox", "geoy", "long", "lat"]
+          hashFunction: "sha256"
+      location.street:
+        type: "location.street"
+        column: "street"
+      location.city:
+        type: "location.city"
+        column: "city"
+      location.longitude:
+        type: "location.longitude"
+        column: "long"
+        transforms:
+        - !<transforms.ParseDoubleTransform> {}
+      location.latitude:
+        type: "location.latitude"
+        column: "lat"
+        transforms:
+        - !<transforms.ParseDoubleTransform> {}
+    name: "location"
+
+  mapprojection:
+    fqn: "ol.mapprojection"
+    entitySetName: "GuilfordMapProjections"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.HashTransform>
+          columns: ["geox", "geoy"]
+          hashFunction: "sha256"
+      ol.x:
+        type: "ol.x"
+        column: "geox"
+      ol.y:
+        type: "ol.y"
+        column: "geoy"
+      ol.name:
+        type: "ol.name"
+        transforms:
+        - !<transforms.ValueTransform>
+          value: "State plane coordinates"
+    name: "mapprojection"
+
+  unit:
+    fqn: "ol.unit"
+    entitySetName: "GuilfordUnits"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "primeunit"
+    conditions:
+    - !<conditions.ConditionalAnd> {}
+    - !<conditions.BooleanRegexCondition>
+      column: "service"
+      pattern: "FIRE"
+      reverse: true
+    - !<conditions.BooleanRegexCondition>
+      column: "service"
+      pattern: "EMS"
+      reverse: true
+    name: "unit"
+
+  emsunit:
+    fqn: "ol.emsunit"
+    entitySetName: "GuilfordEMSUnits"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "primeunit"
+    conditions:
+    - !<conditions.BooleanRegexCondition>
+      column: "service"
+      pattern: "EMS"
+      reverse: false
+    name: "emsunit"
+
+  fireunit:
+    fqn: "ol.fireunit"
+    entitySetName: "GuilfordFireUnits"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "primeunit"
+    conditions:
+    - !<conditions.BooleanRegexCondition>
+      column: "service"
+      pattern: "FIRE"
+      reverse: false
+    name: "fireunit"
+
+  
+
+associationDefinitions:
+
+  locatedat:
+    fqn: "ol.locatedat"
+    entitySetName: "GuilfordLocatedAt"
+    src: "dispatch"
+    dst: "location"
+    propertyDefinitions:
+      general.id:
+        type: "general.id"
+        column: "inci_id"
+    name: "locatedat"
+
+  partof1:
+    fqn: "ol.locatedat"
+    entitySetName: "GuilfordPartOf"
+    src: "dispatch"
+    dst: "location"
+    propertyDefinitions:
+      general.id:
+        type: "general.id"
+        column: "inci_id"
+    name: "partof1"
+
+  partof2:
+    fqn: "ol.locatedat"
+    entitySetName: "GuilfordPartOf"
+    src: "mapprojection"
+    dst: "location"
+    propertyDefinitions:
+      general.id:
+        type: "general.id"
+        column: "inci_id"
+    name: "partof2"
+
+  involvedin:
+    fqn: "ol.involvedin"
+    entitySetName: "GuilfordInvolvedIn"
+    src: "dispatch_agency"
+    dst: "dispatch"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "inci_id"
+    name: "involvedin"
+
+  appearsin1:
+    fqn: "ol.appearsin"
+    entitySetName: "GuilfordAppearsIn"
+    src: "unit"
+    dst: "dispatch"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "inci_id"
+    name: "appearsin1"
+
+  appearsin2:
+    fqn: "ol.appearsin"
+    entitySetName: "GuilfordAppearsIn"
+    src: "emsunit"
+    dst: "dispatch"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "inci_id"
+    name: "appearsin2"
+
+  appearsin3:
+    fqn: "ol.appearsin"
+    entitySetName: "GuilfordAppearsIn"
+    src: "fireunit"
+    dst: "dispatch"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "inci_id"
+    name: "appearsin3"
+
