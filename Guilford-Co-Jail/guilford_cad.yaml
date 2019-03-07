@@ -162,15 +162,14 @@ associationDefinitions:
         column: "inci_id"
     name: "locatedat"
 
-
   partof:
     fqn: "ol.partof"
     entitySetName: "GuilfordPartOf"
     src: "mapprojection"
     dst: "location"
     propertyDefinitions:
-      general.id:
-        type: "general.id"
+      ol.id:
+        type: "ol.id"
         column: "inci_id"
     name: "partof"
 
@@ -217,4 +216,3 @@ associationDefinitions:
         type: "ol.id"
         column: "inci_id"
     name: "appearsin3"
-
