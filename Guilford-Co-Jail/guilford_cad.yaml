@@ -1,5 +1,6 @@
 
 entityDefinitions:
+
   dispatch:
     fqn: "ol.dispatch"
     entitySetName: "GuilfordDispatch"
@@ -161,19 +162,9 @@ associationDefinitions:
         column: "inci_id"
     name: "locatedat"
 
-  partof1:
-    fqn: "ol.locatedat"
-    entitySetName: "GuilfordPartOf"
-    src: "dispatch"
-    dst: "location"
-    propertyDefinitions:
-      general.id:
-        type: "general.id"
-        column: "inci_id"
-    name: "partof1"
 
-  partof2:
-    fqn: "ol.locatedat"
+  partof:
+    fqn: "ol.partof"
     entitySetName: "GuilfordPartOf"
     src: "mapprojection"
     dst: "location"
@@ -181,7 +172,7 @@ associationDefinitions:
       general.id:
         type: "general.id"
         column: "inci_id"
-    name: "partof2"
+    name: "partof"
 
   involvedin:
     fqn: "ol.involvedin"
