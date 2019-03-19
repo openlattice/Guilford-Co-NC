@@ -256,7 +256,7 @@ entityDefinitions:
             value: null
           transformsIfFalse:
           - !<transforms.ColumnTransform>
-          column: "COUNTRY WHERE OFFENDER BORN"
+            column: "COUNTRY WHERE OFFENDER BORN"
     name: "offenderlocation"
 
 
