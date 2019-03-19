@@ -130,6 +130,16 @@ entityDefinitions:
       ol.tract:
         type: "ol.tract"
         column: "tract"
+      ol.locationcoordinates:
+        type: "ol.locationcoordinates"
+        transforms:
+        - !<transforms.GeographyPointTransform>
+          latTransforms:
+          - !<transforms.ColumnTransform>
+            column: "lat"
+          lonTransforms:
+          - !<transforms.ColumnTransform>
+            column: "lon"
     conditions:
     - !<conditions.ConditionalOr> {}
     - !<conditions.BooleanIsNullCondition>
@@ -158,6 +168,12 @@ entityDefinitions:
       reverse: True
     - !<conditions.BooleanIsNullCondition>
       column: "tract"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "lat"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "lon"
       reverse: True
     name: "location"
 
