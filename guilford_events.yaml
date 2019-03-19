@@ -1,0 +1,327 @@
+entityDefinitions:
+
+  officer:
+    fqn: "ol.employee"
+    entitySetName: "GuilfordOfficers"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "offcr_id"
+      publicsafety.employeeid:
+        type: "publicsafety.employeeid"
+        column: "offcr_id"
+    conditions:
+    - !<conditions.BooleanIsNullCondition>
+      column: "offcr_id"
+      reverse: True
+    name: "officer"
+
+  arrest:
+    fqn: "ol.arrest"
+    entitySetName: "GuilfordArrests"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["inci_id", "arr_chrg", "chrgdesc"]
+          separator: "_"
+      ol.arrestdatetime:
+        type: "ol.arrestdatetime"
+        column: "fndDateTime"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.S"]
+    conditions:
+    - !<conditions.ConditionalOr> {}
+    - !<conditions.BooleanIsNullCondition>
+      column: "arr_chrg"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "fndDateTime"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "chrgdesc"
+      reverse: True
+    name: "arrest"
+
+  disposition:
+    fqn: "ol.disposition"
+    entitySetName: "GuilfordDispositions"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "dispostn"
+      criminaljustice.disposition:
+        type: "criminaljustice.disposition"
+        column: "dispostn"
+    conditions:
+    - !<conditions.BooleanIsNullCondition>
+      column: "dispostn"
+      reverse: True
+    name: "disposition"
+
+
+  incident:
+    fqn: "ol.incident"
+    entitySetName: "GuilfordIncidents"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "inci_id"
+      ol.datetime_reported:
+        type: "ol.datetime_reported"
+        column: "reptDateTime"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.S"]
+      ol.datetimeend:
+        type: "ol.datetimeend"
+        column: "fndDateTime"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.S"]
+      ol.datetimestart:
+        type: "ol.datetimestart"
+        column: "occuDateTime"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.S"]
+    conditions:
+    - !<conditions.BooleanIsNullCondition>
+      column: "inci_id"
+      reverse: True
+    name: "incident"
+
+  location:
+    fqn: "ol.location"
+    entitySetName: "GuilfordLocations"
+    propertyDefinitions:
+      general.id:
+        type: "general.id"
+        transforms:
+        - !<transforms.HashTransform>
+          columns: ["streetnbr", "street", "city", "state", "zip", "district", "neighborhd", "tract", "subdivisn"]
+          hashFunction: "sha256"
+      location.city:
+        type: "location.city"
+        column: "city"
+      location.state:
+        type: "location.state"
+        column: "state"
+      location.street:
+        type: "location.street"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["streetnbr", "street"]
+          separator: " "
+      location.zip:
+        type: "location.zip"
+        column: "zip"
+      ol.district:
+        type: "ol.district"
+        column: "district"
+      ol.neighborhood:
+        type: "ol.neighborhood"
+        column: "neighborhd"
+      ol.subdivision:
+        type: "ol.subdivision"
+        column: "subdivisn"
+      ol.tract:
+        type: "ol.tract"
+        column: "tract"
+    conditions:
+    - !<conditions.ConditionalOr> {}
+    - !<conditions.BooleanIsNullCondition>
+      column: "street"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "neighborhd"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "district"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "zip"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "city"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "streetnbr"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "subdivisn"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "state"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "tract"
+      reverse: True
+    name: "location"
+
+  offense:
+    fqn: "ol.offense"
+    entitySetName: "GuilfordOffenses"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["chrgdesc", "ucr_code"]
+      ol.description:
+        type: "ol.description"
+        column: "chrgdesc"
+      ol.number:
+        type: "ol.number"
+        column: "chrgcnt"
+      ol.ucr:
+        type: "ol.ucr"
+        column: "ucr_code"
+    conditions:
+    - !<conditions.ConditionalOr> {}
+    - !<conditions.BooleanIsNullCondition>
+      column: "ucr_code"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "chrgcnt"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "chrgdesc"
+      reverse: True
+    name: "offense"
+
+  zone:
+    fqn: "ol.zone"
+    entitySetName: "GuilfordZones"
+    propertyDefinitions:
+      general.id:
+        type: "general.id"
+        column: "zone"
+      ol.name:
+        type: "ol.name"
+        column: "zone"
+    conditions:
+    - !<conditions.BooleanIsNullCondition>
+      column: "zone"
+      reverse: True
+    name: "zone"
+
+
+
+associationDefinitions:
+
+  clearedby:
+    fqn: "ol.clearedby"
+    entitySetName: "GuilfordClearedBy"
+    src: "incident"
+    dst: "disposition"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "inci_id"
+    name: "clearedby"
+
+  involvedin:
+    fqn: "ol.involvedin"
+    entitySetName: "GuilfordInvolvedIn"
+    src: "officer"
+    dst: "incident"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "inci_id"
+      ol.role:
+        type: "ol.role"
+        transforms:
+        - !<transforms.ValueTransform>
+          value: "Officer"
+    name: "involvedin"
+
+  locatedat1:
+    fqn: "ol.locatedat"
+    entitySetName: "GuilfordLocatedAt"
+    src: "incident"
+    dst: "location"
+    propertyDefinitions:
+      general.id:
+        type: "general.id"
+        transforms:
+        - !<transforms.ConcatCombineTransform>
+          transforms:
+          - !<transforms.HashTransform>
+            columns: ["street", "inci_id", "neighborhd", "district", "city", "streetnbr", "state", "subdivisn", "zip", "tract"]
+            hashFunction: "sha256"
+          - !<transforms.ValueTransform>
+            value: "1"
+    name: "locatedat1"
+
+  locatedat2:
+    fqn: "ol.locatedat"
+    entitySetName: "GuilfordLocatedAt"
+    src: "incident"
+    dst: "zone"
+    propertyDefinitions:
+      general.id:
+        type: "general.id"
+        transforms:
+        - !<transforms.ConcatCombineTransform>
+          transforms:
+          - !<transforms.ColumnTransform>
+            column: "inci_id"
+          - !<transforms.ValueTransform>
+            value: "2"
+    name: "locatedat2"
+
+  relatedto1:
+    fqn: "ol.relatedto"
+    entitySetName: "GuilfordRelatedTo"
+    src: "offense"
+    dst: "incident"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatCombineTransform>
+          transforms:
+          - !<transforms.ColumnTransform>
+            column: "inci_id"
+          - !<transforms.ValueTransform>
+            value: "1"
+    name: "relatedto1"
+
+  relatedto2:
+    fqn: "ol.relatedto"
+    entitySetName: "GuilfordRelatedTo"
+    src: "arrest"
+    dst: "incident"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatCombineTransform>
+          transforms:
+          - !<transforms.ColumnTransform>
+            column: "inci_id"
+          - !<transforms.ValueTransform>
+            value: "2"
+    name: "relatedto2"
+
+  relatedto3:
+    fqn: "ol.relatedto"
+    entitySetName: "GuilfordRelatedTo"
+    src: "offense"
+    dst: "arrest"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatCombineTransform>
+          transforms:
+          - !<transforms.ColumnTransform>
+            column: "inci_id"
+          - !<transforms.ValueTransform>
+            value: "3"
+    name: "relatedto3"
+
