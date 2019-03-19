@@ -1,0 +1,330 @@
+#psql :  offender_profile
+# intellij: "select * from offender_profile;"
+
+
+entityDefinitions:
+  offender:
+    fqn: "general.person"
+    entitySetName: "GuilfordOffenders"
+    propertyDefinitions:
+      nc.SubjectIdentification:
+        type: "nc.SubjectIdentification"
+        column: "OFFENDER NC DOC ID NUMBER"
+      nc.PersonSex:
+        type: "nc.PersonSex"
+        column: "OFFENDER GENDER CODE"
+        transforms:
+        - !<transforms.ReplaceTransform>
+          target: ["MALE", "FEMALE"]
+          goal: ["M", "F"]
+      nc.PersonBirthDate:
+        type: "nc.PersonBirthDate"
+        column: "OFFENDER BIRTH DATE"
+        transforms:
+        - !<transforms.DateTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.S"]
+      nc.PersonRace:
+        type: "nc.PersonRace"
+        # column: "OFFENDER RACE CODE"
+        transforms:
+        - !<transforms.BooleanRegexTransform>
+          column: "OFFENDER RACE CODE"
+          pattern: "(\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?)"
+          transformsIfTrue:
+          - !<transforms.ValueTransform>
+            value: null
+          transformsIfFalse:
+          - !<transforms.ColumnTransform>
+            column: "OFFENDER RACE CODE"
+          - !<transforms.ReplaceTransform>
+            target: [ "BLACK", "UNKNOWN", "OTHER", "ASIAN/ORTL", "INDIAN", "WHITE"]
+            goal: ["black", "", "other", "asian", "amindian", "white"]
+      nc.PersonRace2:
+        type: "nc.PersonRace"
+        # column: "OFFENDER ETHNIC CODE"
+        transforms:
+        - !<transforms.BooleanRegexTransform>
+          column: "OFFENDER ETHNIC CODE"
+          pattern: "(\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?)"
+          transformsIfTrue:
+          - !<transforms.ValueTransform>
+            value: null
+          transformsIfFalse:
+          - !<transforms.ColumnTransform>
+            column: "OFFENDER ETHNIC CODE"
+          - !<transforms.ReplaceTransform>
+            target: ["EUROPEAN/N.AM./AUSTR", "AMERICAN INDIAN", "SLAVIC (E. EUROPEAN)", "ORIENTAL", "OTHER", "ASIAN", "UNKNOWN", "HISPANIC/LATINO", "AFRICAN", "NORDIC/SCANDANAVIAN", "PACIFIC ISLANDER"]
+            goal: ["white", "amindian", "white", "asian", "other", "asian", "", "", "black", "white", "pacisland" ]
+      nc.PersonEthnicity:
+        type: "nc.PersonEthnicity"
+        # column: "OFFENDER ETHNIC CODE"
+        transforms:
+        - !<transforms.BooleanRegexTransform>
+          column: "OFFENDER ETHNIC CODE"
+          pattern: "(\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?)"
+          transformsIfTrue:
+          - !<transforms.ValueTransform>
+            value: null
+          transformsIfFalse:
+          - !<transforms.ColumnTransform>
+            column: "OFFENDER ETHNIC CODE"
+          - !<transforms.ReplaceTransform>
+            target: ["EUROPEAN/N.AM./AUSTR", "AMERICAN INDIAN", "SLAVIC (E. EUROPEAN)", "ORIENTAL", "OTHER", "ASIAN", "UNKNOWN", "HISPANIC/LATINO", "AFRICAN", "NORDIC/SCANDANAVIAN", "PACIFIC ISLANDER"]
+            goal: ["nonhispanic", "nonhispanic", "nonhispanic", "nonhispanic", "nonhispanic", "nonhispanic", "", "hispanic", "nonhispanic", "nonhispanic", "nonhispanic"]
+      ol.datasource:
+        type: "ol.datasource"
+        transforms:
+        - !<transforms.ValueTransform>
+          value: "Guilford Co. DPS"
+    name: "offender"
+
+  offenderappearance:
+    fqn: "ol.physicalappearance"
+    entitySetName: "GuilfordOffenderPhysicalAppearances"
+    propertyDefinitions:
+      general.id:
+        type: "general.id"
+        column: "OFFENDER NC DOC ID NUMBER"
+      ol.height:
+        type: "ol.height"
+        column: "OFFENDER HEIGHT (IN INCHES)"
+      ol.weight:
+        type: "ol.weight"
+        column: "OFFENDER WEIGHT (IN LBS)"
+      nc.complexion:
+        type: "nc.complexion"
+        # column: "OFFENDER SKIN COMPLEXION CODE"
+        transforms:
+        - !<transforms.BooleanRegexTransform>
+          column: "OFFENDER SKIN COMPLEXION CODE"
+          pattern: "(\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?)"
+          transformsIfTrue:
+          - !<transforms.ValueTransform>
+            value: null
+          transformsIfFalse:
+          - !<transforms.ColumnTransform>
+            column: "OFFENDER SKIN COMPLEXION CODE"
+          - !<transforms.ReplaceTransform>
+            target: ["RUDDY", "DARK", "FRECKLED", "LIGHT", "UNKNOWN", "ALBINO", "MEDIUM"]
+            goal: ["ruddy", "dark", "freckled", "light", "unknown", "albino", "medium"]
+      ol.haircolor:
+        type: "ol.haircolor"
+        # column: "OFFENDER HAIR COLOR CODE"
+        transforms:
+        - !<transforms.BooleanRegexTransform>
+          column: "OFFENDER HAIR COLOR CODE"
+          pattern: "(\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?)"
+          transformsIfTrue:
+          - !<transforms.ValueTransform>
+            value: null
+          transformsIfFalse:
+          - !<transforms.ColumnTransform>
+            column: "OFFENDER HAIR COLOR CODE"
+          - !<transforms.ReplaceTransform>
+            target: ["RED", "WHITE", "BLONDE", "BLACK", "SANDY", "OTHER", "UNKNOWN", "BROWN", "BALD", "GRAY"]
+            goal: ["red", "white", "blonde", "black", "sandy", "other", "unknown", "brown", "bald", "gray"]
+      ol.bodydescription:
+        type: "ol.bodydescription"
+        transforms:
+        - !<transforms.BooleanRegexTransform>
+          column: "OFFENDER BODY BUILD CODE"
+          pattern: "(\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?)"
+          transformsIfTrue:
+          - !<transforms.ValueTransform>
+            value: null
+          transformsIfFalse:
+          - !<transforms.ColumnTransform>
+            column: "OFFENDER BODY BUILD CODE"
+      ol.eyecolor:
+        type: "ol.eyecolor"
+        # column: "OFFENDER EYE COLOR CODE"
+        transforms:
+        - !<transforms.BooleanRegexTransform>
+          column: "OFFENDER EYE COLOR CODE"
+          pattern: "(\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?)"
+          transformsIfTrue:
+          - !<transforms.ValueTransform>
+            value: null
+          transformsIfFalse:
+          - !<transforms.ColumnTransform>
+            column: "OFFENDER EYE COLOR CODE"
+          - !<transforms.ReplaceTransform>
+            target: ["AMBER", "BLACK", "VIOLET", "HAZEL", "OTHER", "MIXED", "BROWN", "GRAY", "GREEN", "BLUE"]
+            goal: ["amber", "black", "violet", "hazel", "other", "mixed", "brown", "gray", "green", "blue"]
+    name: "offenderappearance"
+
+  offenderimmigration:
+    fqn: "ol.immigrationstatus"
+    entitySetName: "GuilfordImmigrationStatuses"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "OFFENDER NC DOC ID NUMBER"
+      ol.status:
+        type: "ol.status"
+        column: "OFFENDER CITIZENSHIP CODE"
+    conditions:
+    - !<conditions.BooleanRegexCondition>
+      column: "OFFENDER CITIZENSHIP CODE"
+      pattern: "(?i)(\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?)"
+      reverse: true
+    name: "offenderimmigration"
+
+  offendercommunication:
+    fqn: "ol.communication"
+    entitySetName: "GuilfordCommunication"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "OFFENDER NC DOC ID NUMBER"
+      ol.language:
+        type: "ol.language"
+        transforms:
+        - !<transforms.BooleanRegexTransform>
+          column: "OFFENDER PRIMARY LANGUAGE CODE"
+          pattern: "(\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?)"
+          transformsIfTrue:
+          - !<transforms.ValueTransform>
+            value: null
+          transformsIfFalse:
+          - !<transforms.ColumnTransform>
+            column: "OFFENDER PRIMARY LANGUAGE CODE"
+      ol.primary:
+        type: "ol.primary"
+        transforms:
+        - !<transforms.ValueTransform>
+          value: "Yes"
+        - !<transforms.ParseBoolTransform> {}
+    conditions:
+    - !<conditions.BooleanRegexCondition>
+      column: "OFFENDER PRIMARY LANGUAGE CODE"
+      pattern: "(?i)(\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?)"
+      reverse: true
+    name: "offendercommunication"
+
+  offenderlocation:
+    fqn: "ol.location"
+    entitySetName: "GuilfordBirthPlaces"
+    propertyDefinitions:
+      general.id:
+        type: "general.id"
+        column: "OFFENDER NC DOC ID NUMBER"
+      location.city:
+        type: "location.city"
+        transforms:
+        - !<transforms.BooleanRegexTransform>
+          column: "CITY WHERE OFFENDER BORN"
+          pattern: "(\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?)"
+          transformsIfTrue:
+          - !<transforms.ValueTransform>
+            value: null
+          transformsIfFalse:
+          - !<transforms.ColumnTransform>
+            column: "CITY WHERE OFFENDER BORN"
+      ol.county:
+        type: "ol.county"
+        transforms:
+        - !<transforms.BooleanRegexTransform>
+          column: "NC COUNTY WHERE OFFENDER BORN"
+          pattern: "(\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?)"
+          transformsIfTrue:
+          - !<transforms.ValueTransform>
+            value: null
+          transformsIfFalse:
+          - !<transforms.ColumnTransform>
+            column: "NC COUNTY WHERE OFFENDER BORN"
+      location.state:
+        type: "location.state"
+        transforms:
+        - !<transforms.BooleanRegexTransform>
+          column: "STATE WHERE OFFENDER BORN"
+          pattern: "(\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?)"
+          transformsIfTrue:
+          - !<transforms.ValueTransform>
+            value: null
+          transformsIfFalse:
+          - !<transforms.ColumnTransform>
+            column: "STATE WHERE OFFENDER BORN"
+      ol.country:
+        type: "ol.country"
+        transforms:
+        - !<transforms.BooleanRegexTransform>
+          column: "COUNTRY WHERE OFFENDER BORN"
+          pattern: "(\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?)"
+          transformsIfTrue:
+          - !<transforms.ValueTransform>
+            value: null
+          transformsIfFalse:
+          - !<transforms.ColumnTransform>
+          column: "COUNTRY WHERE OFFENDER BORN"
+    name: "offenderlocation"
+
+
+associationDefinitions:
+  has1:
+    fqn: "ol.has"
+    entitySetName: "GuilfordHas"
+    src: "offender"
+    dst: "offenderappearance"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatCombineTransform>
+          transforms:
+          - !<transforms.ColumnTransform>
+            column: "OFFENDER NC DOC ID NUMBER"
+          - !<transforms.ValueTransform>
+            value: "_offender_appearance"
+    name: "has1"
+
+  has2:
+    fqn: "ol.has"
+    entitySetName: "GuilfordHas"
+    src: "offender"
+    dst: "offenderimmigration"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatCombineTransform>
+          transforms:
+          - !<transforms.ColumnTransform>
+            column: "OFFENDER NC DOC ID NUMBER"
+          - !<transforms.ValueTransform>
+            value: "_offender_immigration"
+    name: "has2"
+
+  reported:
+    fqn: "ol.reported"
+    entitySetName: "GuilfordReported"
+    src: "offender"
+    dst: "offendercommunication"
+    propertyDefinitions:
+      general.id:
+        type: "general.id"
+        transforms:
+        - !<transforms.ConcatCombineTransform>
+          transforms:
+          - !<transforms.ColumnTransform>
+            column: "OFFENDER NC DOC ID NUMBER"
+          - !<transforms.ValueTransform>
+            value: "_offender_communication"
+    name: "reported"
+
+  bornat:
+    fqn: "ol.bornat"
+    entitySetName: "GuilfordBornAt"
+    src: "offender"
+    dst: "offenderlocation"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatCombineTransform>
+          transforms:
+          - !<transforms.ColumnTransform>
+            column: "OFFENDER NC DOC ID NUMBER"
+          - !<transforms.ValueTransform>
+            value: "_offender_birthplace"
+    name: "bornat"
