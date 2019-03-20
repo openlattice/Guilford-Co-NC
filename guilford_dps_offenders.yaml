@@ -25,7 +25,6 @@ entityDefinitions:
           pattern: ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.S"]
       nc.PersonRace:
         type: "nc.PersonRace"
-        # column: "OFFENDER RACE CODE"
         transforms:
         - !<transforms.BooleanRegexTransform>
           column: "OFFENDER RACE CODE"
@@ -70,7 +69,7 @@ entityDefinitions:
             column: "OFFENDER ETHNIC CODE"
           - !<transforms.ReplaceTransform>
             target: ["EUROPEAN/N.AM./AUSTR", "AMERICAN INDIAN", "SLAVIC (E. EUROPEAN)", "ORIENTAL", "OTHER", "ASIAN", "UNKNOWN", "HISPANIC/LATINO", "AFRICAN", "NORDIC/SCANDANAVIAN", "PACIFIC ISLANDER"]
-            goal: ["nonhispanic", "nonhispanic", "nonhispanic", "nonhispanic", "nonhispanic", "nonhispanic", "", "hispanic", "nonhispanic", "nonhispanic", "nonhispanic"]
+            goal: ["", "", "", "", "", "", "", "hispanic", "", "", ""]
       ol.datasource:
         type: "ol.datasource"
         transforms:
@@ -93,7 +92,6 @@ entityDefinitions:
         column: "OFFENDER WEIGHT (IN LBS)"
       nc.complexion:
         type: "nc.complexion"
-        # column: "OFFENDER SKIN COMPLEXION CODE"
         transforms:
         - !<transforms.BooleanRegexTransform>
           column: "OFFENDER SKIN COMPLEXION CODE"
@@ -109,7 +107,6 @@ entityDefinitions:
             goal: ["ruddy", "dark", "freckled", "light", "unknown", "albino", "medium"]
       ol.haircolor:
         type: "ol.haircolor"
-        # column: "OFFENDER HAIR COLOR CODE"
         transforms:
         - !<transforms.BooleanRegexTransform>
           column: "OFFENDER HAIR COLOR CODE"
@@ -151,6 +148,26 @@ entityDefinitions:
           - !<transforms.ReplaceTransform>
             target: ["AMBER", "BLACK", "VIOLET", "HAZEL", "OTHER", "MIXED", "BROWN", "GRAY", "GREEN", "BLUE"]
             goal: ["amber", "black", "violet", "hazel", "other", "mixed", "brown", "gray", "green", "blue"]
+    conditions:
+    - !<conditions.ConditionalOr> {}
+    - !<conditions.BooleanIsNullCondition>
+      column: "OFFENDER HEIGHT (IN INCHES)"
+      reverse: true
+    - !<conditions.BooleanIsNullCondition>
+      column: "OFFENDER WEIGHT (IN LBS)"
+      reverse: true
+    - !<conditions.BooleanIsNullCondition>
+      column: "OFFENDER SKIN COMPLEXION CODE"
+      reverse: true
+    - !<conditions.BooleanIsNullCondition>
+      column: "OFFENDER HAIR COLOR CODE"
+      reverse: true
+    - !<conditions.BooleanIsNullCondition>
+      column: "OFFENDER BODY BUILD CODE"
+      reverse: true
+    - !<conditions.BooleanIsNullCondition>
+      column: "OFFENDER EYE COLOR CODE"
+      reverse: true
     name: "offenderappearance"
 
   offenderimmigration:
@@ -172,7 +189,7 @@ entityDefinitions:
 
   offendercommunication:
     fqn: "ol.communication"
-    entitySetName: "GuilfordCommunication"
+    entitySetName: "GuilfordLanguageSpoken"
     propertyDefinitions:
       ol.id:
         type: "ol.id"
@@ -257,6 +274,20 @@ entityDefinitions:
           transformsIfFalse:
           - !<transforms.ColumnTransform>
             column: "COUNTRY WHERE OFFENDER BORN"
+    conditions:
+    - !<conditions.ConditionalOr> {}
+    - !<conditions.BooleanIsNullCondition>
+      column: "COUNTRY WHERE OFFENDER BORN"
+      reverse: true
+    - !<conditions.BooleanIsNullCondition>
+      column: "STATE WHERE OFFENDER BORN"
+      reverse: true
+    - !<conditions.BooleanIsNullCondition>
+      column: "NC COUNTY WHERE OFFENDER BORN"
+      reverse: true
+    - !<conditions.BooleanIsNullCondition>
+      column: "CITY WHERE OFFENDER BORN"
+      reverse: true
     name: "offenderlocation"
 
 
