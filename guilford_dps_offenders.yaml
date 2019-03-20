@@ -21,7 +21,7 @@ entityDefinitions:
         type: "nc.PersonBirthDate"
         column: "OFFENDER BIRTH DATE"
         transforms:
-        - !<transforms.DateTransform>
+        - !<transforms.DateTimeAsDateTransform>
           pattern: ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.S"]
       nc.PersonRace:
         type: "nc.PersonRace"
@@ -40,7 +40,6 @@ entityDefinitions:
             goal: ["black", "", "other", "asian", "amindian", "white"]
       nc.PersonRace2:
         type: "nc.PersonRace"
-        # column: "OFFENDER ETHNIC CODE"
         transforms:
         - !<transforms.BooleanRegexTransform>
           column: "OFFENDER ETHNIC CODE"
@@ -56,7 +55,6 @@ entityDefinitions:
             goal: ["white", "amindian", "white", "asian", "other", "asian", "", "", "black", "white", "pacisland" ]
       nc.PersonEthnicity:
         type: "nc.PersonEthnicity"
-        # column: "OFFENDER ETHNIC CODE"
         transforms:
         - !<transforms.BooleanRegexTransform>
           column: "OFFENDER ETHNIC CODE"
@@ -102,9 +100,8 @@ entityDefinitions:
           transformsIfFalse:
           - !<transforms.ColumnTransform>
             column: "OFFENDER SKIN COMPLEXION CODE"
-          - !<transforms.ReplaceTransform>
-            target: ["RUDDY", "DARK", "FRECKLED", "LIGHT", "UNKNOWN", "ALBINO", "MEDIUM"]
-            goal: ["ruddy", "dark", "freckled", "light", "unknown", "albino", "medium"]
+          - !<transforms.CaseTransform>
+            type: "lower"
       ol.haircolor:
         type: "ol.haircolor"
         transforms:
@@ -117,9 +114,8 @@ entityDefinitions:
           transformsIfFalse:
           - !<transforms.ColumnTransform>
             column: "OFFENDER HAIR COLOR CODE"
-          - !<transforms.ReplaceTransform>
-            target: ["RED", "WHITE", "BLONDE", "BLACK", "SANDY", "OTHER", "UNKNOWN", "BROWN", "BALD", "GRAY"]
-            goal: ["red", "white", "blonde", "black", "sandy", "other", "unknown", "brown", "bald", "gray"]
+          - !<transforms.CaseTransform>
+            type: "lower"
       ol.bodydescription:
         type: "ol.bodydescription"
         transforms:
@@ -132,9 +128,10 @@ entityDefinitions:
           transformsIfFalse:
           - !<transforms.ColumnTransform>
             column: "OFFENDER BODY BUILD CODE"
+          - !<transforms.CaseTransform>
+            type: "lower"
       ol.eyecolor:
         type: "ol.eyecolor"
-        # column: "OFFENDER EYE COLOR CODE"
         transforms:
         - !<transforms.BooleanRegexTransform>
           column: "OFFENDER EYE COLOR CODE"
@@ -145,29 +142,45 @@ entityDefinitions:
           transformsIfFalse:
           - !<transforms.ColumnTransform>
             column: "OFFENDER EYE COLOR CODE"
-          - !<transforms.ReplaceTransform>
-            target: ["AMBER", "BLACK", "VIOLET", "HAZEL", "OTHER", "MIXED", "BROWN", "GRAY", "GREEN", "BLUE"]
-            goal: ["amber", "black", "violet", "hazel", "other", "mixed", "brown", "gray", "green", "blue"]
+          - !<transforms.CaseTransform>
+            type: "lower"
     conditions:
-    - !<conditions.ConditionalOr> {}
-    - !<conditions.BooleanIsNullCondition>
-      column: "OFFENDER HEIGHT (IN INCHES)"
-      reverse: true
-    - !<conditions.BooleanIsNullCondition>
-      column: "OFFENDER WEIGHT (IN LBS)"
-      reverse: true
-    - !<conditions.BooleanIsNullCondition>
+    - !<conditions.ConditionalAnd> {}
+    - !<conditions.BooleanRegexCondition>
       column: "OFFENDER SKIN COMPLEXION CODE"
+      pattern: "(?i)(\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?)"
       reverse: true
-    - !<conditions.BooleanIsNullCondition>
+    - !<conditions.BooleanRegexCondition>
       column: "OFFENDER HAIR COLOR CODE"
+      pattern: "(?i)(\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?)"
       reverse: true
-    - !<conditions.BooleanIsNullCondition>
+    - !<conditions.BooleanRegexCondition>
       column: "OFFENDER BODY BUILD CODE"
+      pattern: "(?i)(\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?)"
       reverse: true
-    - !<conditions.BooleanIsNullCondition>
+    - !<conditions.BooleanRegexCondition>
       column: "OFFENDER EYE COLOR CODE"
+      pattern: "(?i)(\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?)"
       reverse: true
+    # - !<conditions.ConditionalOr> {}
+    # - !<conditions.BooleanIsNullCondition>
+    #   column: "OFFENDER HEIGHT (IN INCHES)"
+    #   reverse: true
+    # - !<conditions.BooleanIsNullCondition>
+    #   column: "OFFENDER WEIGHT (IN LBS)"
+    #   reverse: true
+    # - !<conditions.BooleanIsNullCondition>
+    #   column: "OFFENDER SKIN COMPLEXION CODE"
+    #   reverse: true
+    # - !<conditions.BooleanIsNullCondition>
+    #   column: "OFFENDER HAIR COLOR CODE"
+    #   reverse: true
+    # - !<conditions.BooleanIsNullCondition>
+    #   column: "OFFENDER BODY BUILD CODE"
+    #   reverse: true
+    # - !<conditions.BooleanIsNullCondition>
+    #   column: "OFFENDER EYE COLOR CODE"
+    #   reverse: true
     name: "offenderappearance"
 
   offenderimmigration:
@@ -179,11 +192,24 @@ entityDefinitions:
         column: "OFFENDER NC DOC ID NUMBER"
       ol.status:
         type: "ol.status"
-        column: "OFFENDER CITIZENSHIP CODE"
+        transforms:
+        - !<transforms.BooleanRegexTransform>
+          column: "OFFENDER CITIZENSHIP CODE"
+          pattern: "\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?"
+          transformsIfTrue:
+          - !<transforms.ValueTransform>
+            value: null
+          transformsIfFalse:
+          - !<transforms.ColumnTransform>
+            column: "OFFENDER CITIZENSHIP CODE"
     conditions:
+    - !<conditions.ConditionalOr> {}
+    - !<conditions.BooleanIsNullCondition>
+      column: "OFFENDER CITIZENSHIP CODE"
+      reverse: true
     - !<conditions.BooleanRegexCondition>
       column: "OFFENDER CITIZENSHIP CODE"
-      pattern: "(?i)(\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?)"
+      pattern: "\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?"
       reverse: true
     name: "offenderimmigration"
 
@@ -199,7 +225,7 @@ entityDefinitions:
         transforms:
         - !<transforms.BooleanRegexTransform>
           column: "OFFENDER PRIMARY LANGUAGE CODE"
-          pattern: "(\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?)"
+          pattern: "\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?"
           transformsIfTrue:
           - !<transforms.ValueTransform>
             value: null
@@ -213,9 +239,13 @@ entityDefinitions:
           value: "Yes"
         - !<transforms.ParseBoolTransform> {}
     conditions:
+    - !<conditions.ConditionalOr> {}
+    - !<conditions.BooleanIsNullCondition>
+      column: "OFFENDER PRIMARY LANGUAGE CODE"
+      reverse: true
     - !<conditions.BooleanRegexCondition>
       column: "OFFENDER PRIMARY LANGUAGE CODE"
-      pattern: "(?i)(\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?)"
+      pattern: "\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?"
       reverse: true
     name: "offendercommunication"
 
@@ -275,19 +305,35 @@ entityDefinitions:
           - !<transforms.ColumnTransform>
             column: "COUNTRY WHERE OFFENDER BORN"
     conditions:
-    - !<conditions.ConditionalOr> {}
-    - !<conditions.BooleanIsNullCondition>
-      column: "COUNTRY WHERE OFFENDER BORN"
-      reverse: true
-    - !<conditions.BooleanIsNullCondition>
-      column: "STATE WHERE OFFENDER BORN"
-      reverse: true
-    - !<conditions.BooleanIsNullCondition>
-      column: "NC COUNTY WHERE OFFENDER BORN"
-      reverse: true
+    - !<conditions.ConditionalAnd> {}
     - !<conditions.BooleanIsNullCondition>
       column: "CITY WHERE OFFENDER BORN"
       reverse: true
+    - !<conditions.BooleanRegexCondition>
+      column: "NC COUNTY WHERE OFFENDER BORN"
+      pattern: "(\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?)"
+      reverse: true
+    - !<conditions.BooleanRegexCondition>
+      column: "STATE WHERE OFFENDER BORN"
+      pattern: "(\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?)"
+      reverse: true
+    - !<conditions.BooleanRegexCondition>
+      column: "COUNTRY WHERE OFFENDER BORN"
+      pattern: "(\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?)"
+      reverse: true
+    # - !<conditions.ConditionalOr> {}
+    # - !<conditions.BooleanIsNullCondition>
+    #   column: "COUNTRY WHERE OFFENDER BORN"
+    #   reverse: true
+    # - !<conditions.BooleanIsNullCondition>
+    #   column: "STATE WHERE OFFENDER BORN"
+    #   reverse: true
+    # - !<conditions.BooleanIsNullCondition>
+    #   column: "NC COUNTY WHERE OFFENDER BORN"
+    #   reverse: true
+    # - !<conditions.BooleanIsNullCondition>
+    #   column: "CITY WHERE OFFENDER BORN"
+    #   reverse: true
     name: "offenderlocation"
 
 
