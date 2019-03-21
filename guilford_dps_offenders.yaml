@@ -81,13 +81,20 @@ entityDefinitions:
     propertyDefinitions:
       general.id:
         type: "general.id"
-        column: "OFFENDER NC DOC ID NUMBER"
+        transforms:
+        - !<transforms.ConcatTransform>
+          separator: "_"
+          columns: ["OFFENDER HEIGHT (IN INCHES)", "OFFENDER WEIGHT (IN LBS)", "OFFENDER SKIN COMPLEXION CODE","OFFENDER HAIR COLOR CODE", "OFFENDER BODY BUILD CODE", "OFFENDER EYE COLOR CODE" ]
       ol.height:
         type: "ol.height"
         column: "OFFENDER HEIGHT (IN INCHES)"
+        transforms:
+        - !<transforms.ParseIntTransform> {}
       ol.weight:
         type: "ol.weight"
         column: "OFFENDER WEIGHT (IN LBS)"
+        transforms:
+        - !<transforms.ParseIntTransform> {}
       nc.complexion:
         type: "nc.complexion"
         transforms:
@@ -162,34 +169,15 @@ entityDefinitions:
       column: "OFFENDER EYE COLOR CODE"
       pattern: "(?i)(\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?)"
       reverse: true
-    # - !<conditions.ConditionalOr> {}
-    # - !<conditions.BooleanIsNullCondition>
-    #   column: "OFFENDER HEIGHT (IN INCHES)"
-    #   reverse: true
-    # - !<conditions.BooleanIsNullCondition>
-    #   column: "OFFENDER WEIGHT (IN LBS)"
-    #   reverse: true
-    # - !<conditions.BooleanIsNullCondition>
-    #   column: "OFFENDER SKIN COMPLEXION CODE"
-    #   reverse: true
-    # - !<conditions.BooleanIsNullCondition>
-    #   column: "OFFENDER HAIR COLOR CODE"
-    #   reverse: true
-    # - !<conditions.BooleanIsNullCondition>
-    #   column: "OFFENDER BODY BUILD CODE"
-    #   reverse: true
-    # - !<conditions.BooleanIsNullCondition>
-    #   column: "OFFENDER EYE COLOR CODE"
-    #   reverse: true
     name: "offenderappearance"
 
   offenderimmigration:
     fqn: "ol.immigrationstatus"
-    entitySetName: "GuilfordImmigrationStatuses"
+    entitySetName: "GuilfordImmigrationStatus"
     propertyDefinitions:
       ol.id:
         type: "ol.id"
-        column: "OFFENDER NC DOC ID NUMBER"
+        column: "OFFENDER CITIZENSHIP CODE"
       ol.status:
         type: "ol.status"
         transforms:
@@ -203,13 +191,8 @@ entityDefinitions:
           - !<transforms.ColumnTransform>
             column: "OFFENDER CITIZENSHIP CODE"
     conditions:
-    - !<conditions.ConditionalOr> {}
     - !<conditions.BooleanIsNullCondition>
       column: "OFFENDER CITIZENSHIP CODE"
-      reverse: true
-    - !<conditions.BooleanRegexCondition>
-      column: "OFFENDER CITIZENSHIP CODE"
-      pattern: "\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?"
       reverse: true
     name: "offenderimmigration"
 
@@ -219,7 +202,7 @@ entityDefinitions:
     propertyDefinitions:
       ol.id:
         type: "ol.id"
-        column: "OFFENDER NC DOC ID NUMBER"
+        column: "OFFENDER PRIMARY LANGUAGE CODE"
       ol.language:
         type: "ol.language"
         transforms:
@@ -235,17 +218,25 @@ entityDefinitions:
       ol.primary:
         type: "ol.primary"
         transforms:
-        - !<transforms.ValueTransform>
-          value: "Yes"
-        - !<transforms.ParseBoolTransform> {}
+        - !<transforms.BooleanRegexTransform>
+          column: "OFFENDER PRIMARY LANGUAGE CODE"
+          pattern: "\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?"
+          transformsIfTrue:
+          - !<transforms.ValueTransform>
+            value: null
+          transformsIfFalse:
+          - !<transforms.BooleanIsNullTransform>
+            column: "OFFENDER PRIMARY LANGUAGE CODE"
+            transformsIfTrue:
+            - !<transforms.ValueTransform>
+              value: null
+            transformsIfFalse:
+            - !<transforms.ValueTransform>
+              value: "yes"
+            - !<transforms.ParseBoolTransform> {}
     conditions:
-    - !<conditions.ConditionalOr> {}
     - !<conditions.BooleanIsNullCondition>
       column: "OFFENDER PRIMARY LANGUAGE CODE"
-      reverse: true
-    - !<conditions.BooleanRegexCondition>
-      column: "OFFENDER PRIMARY LANGUAGE CODE"
-      pattern: "\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?"
       reverse: true
     name: "offendercommunication"
 
@@ -255,7 +246,10 @@ entityDefinitions:
     propertyDefinitions:
       general.id:
         type: "general.id"
-        column: "OFFENDER NC DOC ID NUMBER"
+        transforms:
+        - !<transforms.ConcatTransform>
+          separator: "_"
+          columns: ["CITY WHERE OFFENDER BORN", "NC COUNTY WHERE OFFENDER BORN", "STATE WHERE OFFENDER BORN","COUNTRY WHERE OFFENDER BORN"]
       location.city:
         type: "location.city"
         transforms:
@@ -307,35 +301,18 @@ entityDefinitions:
     conditions:
     - !<conditions.ConditionalAnd> {}
     - !<conditions.BooleanIsNullCondition>
+      column: "COUNTRY WHERE OFFENDER BORN"
+      reverse: true
+    - !<conditions.BooleanIsNullCondition>
+      column: "STATE WHERE OFFENDER BORN"
+      reverse: true
+    - !<conditions.BooleanIsNullCondition>
+      column: "NC COUNTY WHERE OFFENDER BORN"
+      reverse: true
+    - !<conditions.BooleanIsNullCondition>
       column: "CITY WHERE OFFENDER BORN"
       reverse: true
-    - !<conditions.BooleanRegexCondition>
-      column: "NC COUNTY WHERE OFFENDER BORN"
-      pattern: "(\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?)"
-      reverse: true
-    - !<conditions.BooleanRegexCondition>
-      column: "STATE WHERE OFFENDER BORN"
-      pattern: "(\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?)"
-      reverse: true
-    - !<conditions.BooleanRegexCondition>
-      column: "COUNTRY WHERE OFFENDER BORN"
-      pattern: "(\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?)"
-      reverse: true
-    # - !<conditions.ConditionalOr> {}
-    # - !<conditions.BooleanIsNullCondition>
-    #   column: "COUNTRY WHERE OFFENDER BORN"
-    #   reverse: true
-    # - !<conditions.BooleanIsNullCondition>
-    #   column: "STATE WHERE OFFENDER BORN"
-    #   reverse: true
-    # - !<conditions.BooleanIsNullCondition>
-    #   column: "NC COUNTY WHERE OFFENDER BORN"
-    #   reverse: true
-    # - !<conditions.BooleanIsNullCondition>
-    #   column: "CITY WHERE OFFENDER BORN"
-    #   reverse: true
     name: "offenderlocation"
-
 
 associationDefinitions:
   has1:
