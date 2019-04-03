@@ -1,0 +1,255 @@
+
+entityDefinitions:
+
+  warrant:
+    fqn: "ol.warrant"
+    entitySetName: "GuilfordWarrants"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatCombineTransform>
+          transforms:
+          - !<transforms.BooleanRegexTransform>
+            column: "OFFENDER NC DOC ID NUMBER"
+            pattern: "^\\d{6}$"
+            transformsIfTrue:
+            - !<transforms.ConcatCombineTransform>
+              transforms:
+              - !<transforms.ValueTransform>
+                value: "0"
+              - !<transforms.ColumnTransform>
+                column: "OFFENDER NC DOC ID NUMBER"
+              separator: ""
+            transformsIfFalse:
+            - !<transforms.ColumnTransform>
+              column: "OFFENDER NC DOC ID NUMBER"
+          - !<transforms.ConcatTransform>
+            columns: ["WARRANT EXTRADITION STATUS CD", "WARRANT STATUS CODE", "DATE OF LAST UPDATE", "TIME OF LAST UPDATE", "WARRANT COMMITMENT PREFIX"]
+      ol.extraditionstatus:
+        type: "ol.extraditionstatus"
+        column: "WARRANT EXTRADITION STATUS CD"
+      ol.status:
+        type: "ol.status"
+        column: "WARRANT STATUS CODE"
+      general.entryupdated:
+        type: "general.entryupdated"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["DATE OF LAST UPDATE", "TIME OF LAST UPDATE"]
+          separator: " "
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd 00:00:00 HH:mm:ss", "yyyy-MM-dd 00:00:00 HH:mm:ss", "yyyy-MM-dd 00:00:00.0 HH:mm:ss.S", "yyyy-MM-dd 00:00:00.0 HH:mm:ss", "yyyy-MM-dd 00:00:00 HH:mm:ss.S"]
+      ol.type:
+        type: "ol.type"
+        transforms:
+        - !<transforms.BooleanIsNullTransform>
+          column: "WARRANT COMMITMENT PREFIX"
+          transformsIfTrue:
+          - !<transforms.ValueTransform>
+            value: ""
+          transformsIfFalse:
+          - !<transforms.ValueTransform>
+            value: "commitment"
+      ol.code:
+        type: "ol.code"
+        column: "WARRANT COMMITMENT PREFIX"
+    conditions:
+    - !<conditions.ConditionalOr> {}
+    - !<conditions.BooleanIsNullCondition>
+      column: "TIME OF LAST UPDATE"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "DATE OF LAST UPDATE"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "WARRANT EXTRADITION STATUS CD"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "WARRANT COMMITMENT PREFIX"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "WARRANT STATUS CODE"
+      reverse: True
+    name: "warrant"
+
+  person:
+    fqn: "general.person"
+    entitySetName: "GuilfordOffenders"
+    propertyDefinitions:
+      nc.SubjectIdentification:
+        type: "nc.SubjectIdentification"
+        transforms:
+        - !<transforms.BooleanRegexTransform>
+          column: "OFFENDER NC DOC ID NUMBER"
+          pattern: "^\\d{6}$"
+          transformsIfTrue:
+          - !<transforms.ConcatCombineTransform>
+            transforms:
+            - !<transforms.ValueTransform>
+              value: "0"
+            - !<transforms.ColumnTransform>
+              column: "OFFENDER NC DOC ID NUMBER"
+            separator: ""
+          transformsIfFalse:
+          - !<transforms.ColumnTransform>
+            column: "OFFENDER NC DOC ID NUMBER"
+    conditions:
+    - !<conditions.BooleanIsNullCondition>
+      column: "OFFENDER NC DOC ID NUMBER"
+      reverse: True
+    name: "person"
+
+  sentence:
+    fqn: "ol.sentence"
+    entitySetName: "GuilfordSentences_DPS"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.BooleanRegexTransform>
+          column: "OFFENDER NC DOC ID NUMBER"
+          pattern: "^\\d{6}$"
+          transformsIfTrue:
+          - !<transforms.ConcatCombineTransform>
+            separator: ""
+            transforms:
+            - !<transforms.ValueTransform>
+              value: "0"
+            - !<transforms.ColumnTransform>
+              column: "OFFENDER NC DOC ID NUMBER"
+          transformsIfFalse:
+          - !<transforms.ColumnTransform>
+            column: "OFFENDER NC DOC ID NUMBER"
+    conditions:
+    - !<conditions.BooleanIsNullCondition>
+      column: "OFFENDER NC DOC ID NUMBER"
+      reverse: True
+    name: "sentence"
+
+  sentencecomponent:
+    fqn: "ol.sentencecomponent"
+    entitySetName: "GuilfordSentenceComponents"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatCombineTransform>
+          transforms:
+          - !<transforms.BooleanRegexTransform>
+            column: "OFFENDER NC DOC ID NUMBER"
+            pattern: "^\\d{6}$"
+            transformsIfTrue:
+            - !<transforms.ConcatCombineTransform>
+              separator: ""
+              transforms:
+              - !<transforms.ValueTransform>
+                value: "0"
+              - !<transforms.ColumnTransform>
+                column: "OFFENDER NC DOC ID NUMBER"
+            transformsIfFalse:
+            - !<transforms.ColumnTransform>
+              column: "OFFENDER NC DOC ID NUMBER"
+          - !<transforms.ColumnTransform>
+            column: "SENTENCE COMPONENT NUMBER"
+    name: "sentencecomponent"
+
+
+associationDefinitions:
+
+  servedwith:
+    fqn: "ol.servedwith"
+    entitySetName: "GuilfordServedWith"
+    src: "person"
+    dst: "warrant"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatCombineTransform>
+          transforms:
+          - !<transforms.BooleanRegexTransform>
+            column: "OFFENDER NC DOC ID NUMBER"
+            pattern: "^\\d{6}$"
+            transformsIfTrue:
+            - !<transforms.ConcatCombineTransform>
+              transforms:
+              - !<transforms.ValueTransform>
+                value: "0"
+              - !<transforms.ColumnTransform>
+                column: "OFFENDER NC DOC ID NUMBER"
+              separator: ""
+            transformsIfFalse:
+            - !<transforms.ColumnTransform>
+              column: "OFFENDER NC DOC ID NUMBER"
+          - !<transforms.ConcatTransform>
+            columns: ["WARRANT EXTRADITION STATUS CD", "WARRANT STATUS CODE", "DATE OF LAST UPDATE", "TIME OF LAST UPDATE", "WARRANT COMMITMENT PREFIX"]
+    name: "servedwith"
+
+
+  relatedto1:
+    fqn: "ol.relatedto"
+    entitySetName: "GuilfordRelatedTo"
+    src: "warrant"
+    dst: "sentence"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatCombineTransform>
+          transforms:
+          - !<transforms.BooleanRegexTransform>
+            column: "OFFENDER NC DOC ID NUMBER"
+            pattern: "^\\d{6}$"
+            transformsIfTrue:
+            - !<transforms.ConcatCombineTransform>
+              transforms:
+              - !<transforms.ValueTransform>
+                value: "0"
+              - !<transforms.ColumnTransform>
+                column: "OFFENDER NC DOC ID NUMBER"
+              separator: ""
+            transformsIfFalse:
+            - !<transforms.ColumnTransform>
+              column: "OFFENDER NC DOC ID NUMBER"
+          - !<transforms.ConcatTransform>
+            columns: ["WARRANT EXTRADITION STATUS CD", "WARRANT STATUS CODE", "DATE OF LAST UPDATE", "TIME OF LAST UPDATE", "WARRANT COMMITMENT PREFIX"]
+          - !<transforms.ValueTransform>
+            value: "1"
+    name: "relatedto1"
+
+
+  relatedto2:
+    fqn: "ol.relatedto"
+    entitySetName: "GuilfordRelatedTo"
+    src: "warrant"
+    dst: "sentencecomponent"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatCombineTransform>
+          transforms:
+          - !<transforms.BooleanRegexTransform>
+            column: "OFFENDER NC DOC ID NUMBER"
+            pattern: "^\\d{6}$"
+            transformsIfTrue:
+            - !<transforms.ConcatCombineTransform>
+              transforms:
+              - !<transforms.ValueTransform>
+                value: "0"
+              - !<transforms.ColumnTransform>
+                column: "OFFENDER NC DOC ID NUMBER"
+              separator: ""
+            transformsIfFalse:
+            - !<transforms.ColumnTransform>
+              column: "OFFENDER NC DOC ID NUMBER"
+          - !<transforms.ConcatTransform>
+            columns: ["WARRANT EXTRADITION STATUS CD", "WARRANT STATUS CODE", "DATE OF LAST UPDATE", "TIME OF LAST UPDATE", "WARRANT COMMITMENT PREFIX"]
+          - !<transforms.ValueTransform>
+            value: "2"
+    name: "relatedto2"
+
+
+
+

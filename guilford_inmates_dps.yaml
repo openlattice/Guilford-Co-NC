@@ -1,0 +1,1016 @@
+
+
+entityDefinitions:
+
+  inmate:
+    fqn: "general.person"
+    entitySetName: "GuilfordOffenders"
+    propertyDefinitions:
+      nc.SubjectIdentification:
+        type: "nc.SubjectIdentification"
+        column: "INMATE DOC NUMBER"
+      nc.PersonBirthDate:
+        type: "nc.PersonBirthDate"
+        column: "INMATE BIRTH DATE"
+        transforms:
+        - !<transforms.DateTimeAsDateTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.S"]
+      nc.PersonEthnicity:
+        type: "nc.PersonEthnicity"
+        transforms:
+        - !<transforms.ReplaceTransform>
+          column: "INMATE ETHNIC AFFILIATION"
+          target: ['UNKNOWN', 'EUROPEAN/N.AM./AUSTR', 'AFRICAN', 'ASIAN', 'OTHER', 'HISPANIC/LATINO', 'AMERICAN INDIAN', 'SLAVIC (E. EUROPEAN)', 'PACIFIC ISLANDER', 'ORIENTAL', 'NORDIC/SCANDANAVIAN', '??????????????????????????????']
+          goal: ['', '', '', '', '', 'hispanic', '', '', '', '', '', '']
+      nc.PersonRace:
+        type: "nc.PersonRace"
+        transforms:
+        - !<transforms.BooleanRegexTransform>
+          column: "INMATE RACE CODE"
+          pattern: "OTHER"
+          transformsIfTrue:
+          - !<transforms.ReplaceTransform>
+            column: "INMATE ETHNIC AFFILIATION"
+            target: ['UNKNOWN', 'EUROPEAN/N.AM./AUSTR', 'AFRICAN', 'ASIAN', 'OTHER', 'HISPANIC/LATINO', 'AMERICAN INDIAN', 'SLAVIC (E. EUROPEAN)', 'PACIFIC ISLANDER', 'ORIENTAL', 'NORDIC/SCANDANAVIAN', '??????????????????????????????']
+            goal: ['', '', '', '', '', '', 'amindian', '', 'pacisland', '', '', '']
+          transformsIfFalse:
+          - !<transforms.ReplaceTransform>
+            column: "INMATE RACE CODE"
+            target: ['WHITE', 'BLACK', 'OTHER', 'INDIAN', 'ASIAN/ORTL', '??????????????????????????????', 'UNKNOWN']
+            goal: ['white', 'black', 'other', 'asian', 'asian', '', '']
+      nc.PersonGivenName:
+        type: "nc.PersonGivenName"
+        column: "INMATE FIRST NAME"
+      nc.PersonMiddleName:
+        type: "nc.PersonMiddleName"
+        column: "INMATE MIDDLE INITIAL"
+      nc.PersonSurName:
+        type: "nc.PersonSurName"
+        column: "INMATE LAST NAME"
+      nc.PersonSex:
+        type: "nc.PersonSex"
+        column: "INMATE GENDER CODE"
+        transforms:
+        - !<transforms.ReplaceTransform>
+          target: ["MALE", "FEMALE"]
+          goal: ["M", "F"]
+      ol.datasource:
+        type: "ol.datasource"
+        transforms:
+        - !<transforms.ColumnTransform>
+          column: "NC DPS"
+    conditions:
+    - !<conditions.ConditionalOr> {}
+    - !<conditions.BooleanIsNullCondition>
+      column: "INMATE FIRST NAME"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "INMATE MIDDLE INITIAL"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "INMATE LAST NAME"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "INMATE BIRTH DATE"
+      reverse: True
+    name: "inmate"
+
+  arrest:
+    fqn: "ol.arrest"
+    entitySetName: "GuilfordArrests_DPS"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["INMATE DOC NUMBER", "DATE OF LAST ARREST ON PAROLE"]
+      ol.arrestdatetime:
+        type: "ol.arrestdatetime"
+        column: "DATE OF LAST ARREST ON PAROLE"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss","yyyy-MM-dd HH:mm:ss.S"]
+    conditions:
+    - !<conditions.BooleanIsNullCondition>
+      column: "DATE OF LAST ARREST ON PAROLE"
+      reverse: True
+    name: "arrest"
+
+  charge:
+    fqn: "ol.charge"
+    entitySetName: "GuilfordCharges"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "MOST SERIOUS OFFNSE CURR INCAR"
+      ol.attemptedcompleted:
+        type: "ol.attemptedcompleted"
+        transforms:
+        - !<transforms.BooleanRegexTransform>
+          column: "PRIMARY OFFENSE QUALIFIER"
+          pattern: "ATTEMPTED"
+          transformsIfTrue:
+          - !<transforms.ColumnTransform>
+            column: "PRIMARY OFFENSE QUALIFIER"
+          transformsIfFalse:
+          - !<transforms.ValueTransform>
+            value: ""
+      ol.description:
+        type: "ol.description"
+        column: "MOST SERIOUS OFFNSE CURR INCAR"
+      ol.mostserious:
+        type: "ol.mostserious"
+        transforms:
+        - !<transforms.ValueTransform>
+          value: true
+      ol.qualifier:
+        type: "ol.qualifier"
+        transforms:
+        - !<transforms.BooleanRegexTransform>
+          column: "PRIMARY OFFENSE QUALIFIER"
+          pattern: "\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?"
+          transformsIfFalse:
+          - !<transforms.ColumnTransform>
+            column: "PRIMARY OFFENSE QUALIFIER"
+          transformsIfTrue:
+          - !<transforms.ValueTransform>
+            value: ""
+    conditions:
+    - !<conditions.BooleanRegexCondition>
+      column: "MOST SERIOUS OFFNSE CURR INCAR"
+      pattern: "^$|\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?"
+      reverse: True
+    name: "charge"
+
+  chargehistory:
+    fqn: "ol.charge"
+    entitySetName: "GuilfordCharges"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "INMATE IS FELON/MISDEMEANANT"
+      ol.level:
+        type: "ol.level"
+        transforms:
+        - !<transforms.BooleanRegexTransform>
+          column: "INMATE IS FELON/MISDEMEANANT"
+          pattern: "FELON"
+          transformsIfFalse:
+          - !<transforms.BooleanRegexTransform>
+            column: "INMATE IS FELON/MISDEMEANANT"
+            pattern: "MISD"
+            transformsIfFalse:
+            - !<transforms.ValueTransform>
+              value: ""
+            transformsIfTrue:
+            - !<transforms.ValueTransform>
+              value: "misdemeanor"
+          transformsIfTrue:
+          - !<transforms.ValueTransform>
+            value: "felony"
+    conditions:
+    - !<conditions.BooleanIsNullCondition>
+      column: "INMATE IS FELON/MISDEMEANANT"
+      reverse: True
+    name: "chargehistory"
+
+  diagnostic_center:
+    fqn: "o.facility"
+    entitySetName: "GuilfordDiagnosticCenters"
+    propertyDefinitions:
+      general.id:
+        type: "general.id"
+        transforms:
+        - !<transforms.BooleanRegexTransform>
+          column: "ADMITTING DIAGNOSTIC CENTER"
+          pattern: "\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?"
+          transformsIfFalse:
+          - !<transforms.ColumnTransform>
+            column: "ADMITTING DIAGNOSTIC CENTER"
+          transformsIfTrue:
+          - !<transforms.ValueTransform>
+            value: ""
+      ol.name:
+        type: "ol.name"
+        transforms:
+        - !<transforms.BooleanRegexTransform>
+          column: "ADMITTING DIAGNOSTIC CENTER"
+          pattern: "\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?"
+          transformsIfFalse:
+          - !<transforms.ColumnTransform>
+            column: "ADMITTING DIAGNOSTIC CENTER"
+          transformsIfTrue:
+          - !<transforms.ValueTransform>
+            value: ""
+    conditions:
+    - !<conditions.ConditionalAnd> {}
+    - !<conditions.BooleanIsNullCondition>
+      column: "ADMITTING DIAGNOSTIC CENTER"
+      reverse: True
+    - !<conditions.BooleanRegexCondition>
+      column: "ADMITTING DIAGNOSTIC CENTER"
+      pattern: "\\?"
+      reverse: True
+    name: "diagnostic_center"
+
+  incarceration_facility:
+    fqn: "o.facility"
+    entitySetName: "GuilfordIncarcerationFacilities_DPS"
+    propertyDefinitions:
+      general.id:
+        type: "general.id"
+        transforms:
+        - !<transforms.BooleanRegexTransform>
+          column: "INMATE FACILITY CODE"
+          pattern: "\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?"
+          transformsIfFalse:
+          - !<transforms.ColumnTransform>
+            column: "INMATE FACILITY CODE"
+          transformsIfTrue:
+          - !<transforms.ValueTransform>
+            value: ""
+      ol.name:
+        type: "ol.name"
+        column: "INMATE FACILITY CODE"
+        transforms:
+        - !<transforms.BooleanRegexTransform>
+          column: "INMATE FACILITY CODE"
+          pattern: "\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?"
+          transformsIfFalse:
+          - !<transforms.ColumnTransform>
+            column: "INMATE FACILITY CODE"
+          transformsIfTrue:
+          - !<transforms.ValueTransform>
+            value: ""
+    conditions:
+    - !<conditions.ConditionalAnd> {}
+    - !<conditions.BooleanIsNullCondition>
+      column: "INMATE FACILITY CODE"
+      reverse: True
+    - !<conditions.BooleanRegexCondition>
+      column: "INMATE FACILITY CODE"
+      pattern: "\\?"
+      reverse: True
+    name: "incarceration_facility"
+
+  incarcerationhistory:
+    fqn: "ol.incarcerationhistory"
+    entitySetName: "GuilfordIncarcerationHistories"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "INMATE DOC NUMBER"
+      ol.escapehistory:
+        type: "ol.escapehistory"
+        column: "ESCAPE HISTORY FLAG"
+        transforms:
+        - !<transforms.ParseBoolTransform> {}
+      ol.historicalconditionindicator:
+        type: "ol.historicalconditionindicator"
+        column: "PRIOR INCARCERATIONS FLAG"
+        transforms:
+        - !<transforms.ParseBoolTransform> {}
+    conditions:
+    - !<conditions.ConditionalOr> {}
+    - !<conditions.BooleanIsNullCondition>
+      column: "PRIOR INCARCERATIONS FLAG"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "ESCAPE HISTORY FLAG"
+      reverse: True
+    name: "incarcerationhistory"
+
+  inmateclassification:
+    fqn: "ol.inmateclassification"
+    entitySetName: "GuilfordInmateCustodyClassifications"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.HashTransform>
+          columns: ["CUSTODY CLASS CODE", "NEXT CUSTODY REVIEW DATE", "INMATE CONTROL STATUS CODE"]
+          hashFunction: "sha256"
+      ol.class:
+        type: "ol.class"
+        column: "CUSTODY CLASS CODE"
+      ol.datescheduled:
+        type: "ol.datescheduled"
+        column: "NEXT CUSTODY REVIEW DATE"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss","yyyy-MM-dd HH:mm:ss.S"]
+      ol.inmatecontrolstatus:
+        type: "ol.inmatecontrolstatus"
+        column: "INMATE CONTROL STATUS CODE"
+    conditions:
+    - !<conditions.ConditionalOr> {}
+    - !<conditions.BooleanIsNullCondition>
+      column: "NEXT CUSTODY REVIEW DATE"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "CUSTODY CLASS CODE"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "INMATE CONTROL STATUS CODE"
+      reverse: True
+    name: "inmateclassification"
+
+
+  #this is the first DPS flight to include jailstay, so ongoing pk convention is decided here.
+  jailstay:
+    fqn: "ol.jailstay"
+    entitySetName: "GuilfordJailStays_DPS"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["INMATE DOC NUMBER", "INMATE ADMISSION DATE"]
+      ol.category:
+        type: "ol.category"
+        column: "INMATE CONTROL STATUS CODE"
+      criminaljustice.releasetype:
+        type: "criminaljustice.releasetype"
+        transforms:
+        - !<transforms.BooleanRegexTransform>
+          column: "TYPE OF LAST INMATE MOVEMENT"
+          pattern: "\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?"
+          transformsIfFalse:
+          - !<transforms.ColumnTransform>
+            column: "TYPE OF LAST INMATE MOVEMENT"
+          transformsIfTrue:
+          - !<transforms.ValueTransform>
+            value: ""
+      incident.startdatetime:
+        type: "incident.startdatetime"
+        column: "INMATE ADMISSION DATE"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss","yyyy-MM-dd HH:mm:ss.S"]
+      ol.class:
+        type: "ol.class"
+        column: "CUSTODY CLASS CODE"
+      ol.notes:
+        type: "ol.notes"
+        column: "INMATE SPECIAL CHARACTERISTICS"
+      ol.releasedatetime:
+        type: "ol.releasedatetime"
+        column: "DATE OF LAST INMATE MOVEMENT"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss","yyyy-MM-dd HH:mm:ss.S"]
+      ol.totalinfractioncount:
+        type: "ol.totalinfractioncount"
+        column: "TOTAL DISCIPLINE INFRACTIONS"
+        transforms:
+        - !<transforms.ParseIntTransform> {}
+      ol.totalsentencecount:
+        type: "ol.totalsentencecount"
+        column: "TOTAL SENTENCE COUNT"
+        transforms:
+        - !<transforms.ParseIntTransform> {}
+      general.status:
+        type: "general.status"
+        column: "INMATE RECORD STATUS CODE"
+    conditions:
+    - !<conditions.BooleanIsNullCondition>
+      column: "INMATE DOC NUMBER"
+      reverse: True
+    name: "jailstay"
+
+  jailstaylength:
+    fqn: "ol.jailstaylength"
+    entitySetName: "GuilfordTimeServed_DPS"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "DAYS SERVED IN DOC CUSTODY"
+      criminaljustice.timeserveddays:
+        type: "criminaljustice.timeserveddays"
+        column: "DAYS SERVED IN DOC CUSTODY"
+        transforms:
+        - !<transforms.ParseIntTransform> {}
+      ol.datetime_release:
+        type: "ol.datetime_release"
+        column: "DATE OF LAST INMATE MOVEMENT"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss","yyyy-MM-dd HH:mm:ss.S"]
+      ol.projectedreleasedatetime:
+        type: "ol.projectedreleasedatetime"
+        column: "FINAL RULING MAX RELEASE DATE"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss","yyyy-MM-dd HH:mm:ss.S"]
+      ol.earnedtimerate:
+        type: "ol.earnedtimerate"
+        transforms:
+        - !<transforms.BooleanRegexTransform>
+          column: "GT RATE / ET LEVEL CODE"
+          pattern: "\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?"
+          transformsIfFalse:
+          - !<transforms.ColumnTransform>
+            column: "GT RATE / ET LEVEL CODE"
+          transformsIfTrue:
+          - !<transforms.ValueTransform>
+            value: ""
+    conditions:
+    - !<conditions.ConditionalOr> {}
+    - !<conditions.BooleanIsNullCondition>
+      column: "DAYS SERVED IN DOC CUSTODY"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "FINAL RULING MAX RELEASE DATE"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "GT RATE / ET LEVEL CODE"
+      reverse: True
+    name: "jailstaylength"
+
+  notification:
+    fqn: "ol.notification"
+    entitySetName: "GuilfordPrisonInfractions"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.HashTransform>
+          columns: ["LAST DISCIPLINE INFRACTION DT.", "LATEST DISCIPLINE INFRACTION"]
+          hashFunction: "sha256"
+      general.datetime:
+        type: "general.datetime"
+        column: "LAST DISCIPLINE INFRACTION DT."
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss","yyyy-MM-dd HH:mm:ss.S"]
+      ol.description:
+        type: "ol.description"
+        transforms:
+        - !<transforms.BooleanRegexTransform>
+          column: "LATEST DISCIPLINE INFRACTION"
+          pattern: "\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?"
+          transformsIfFalse:
+          - !<transforms.ColumnTransform>
+            column: "LATEST DISCIPLINE INFRACTION"
+          transformsIfTrue:
+          - !<transforms.ValueTransform>
+            value: ""
+    conditions:
+    - !<conditions.ConditionalOr> {}
+    - !<conditions.BooleanIsNullCondition>
+      column: "LATEST DISCIPLINE INFRACTION"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "LAST DISCIPLINE INFRACTION DT."
+      reverse: True
+    name: "notification"
+
+  oldestsentence:
+    fqn: "ol.sentence"
+    entitySetName: "GuilfordSentences_DPS"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "INMATE DOC NUMBER"
+      datetime.received:
+        type: "datetime.received"
+        column: "OLDEST CONVICTION DATE"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss","yyyy-MM-dd HH:mm:ss.S"]
+    conditions:
+    - !<conditions.BooleanIsNullCondition>
+      column: "OLDEST CONVICTION DATE"
+      reverse: True
+    name: "oldestsentence"
+
+  paroleanalyst:
+    fqn: "ol.employee"
+    entitySetName: "GuilfordParoleAnalysts"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "PAROLE CASE ANALYST"
+      publicsafety.employeeid:
+        type: "publicsafety.employeeid"
+        column: "PAROLE CASE ANALYST"
+    conditions:
+    - !<conditions.BooleanIsNullCondition>
+      column: "PAROLE CASE ANALYST"
+      reverse: True
+    name: "paroleanalyst"
+
+  parolereview:
+    fqn: "ol.parolereview"
+    entitySetName: "GuilfordParoleReviews_DPS"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.HashTransform>
+          columns: ["NEXT PAROLE COMM. REVIEW DATE", "FINAL RULING PED", "PAROLE AND TERMINATE STATUS", "INMATE TIME COMP STATUS CODE", "NEXT PAROLE REVIEW TYPE CODE"]
+          hashFunction: "sha256"
+      ol.datescheduled:
+        type: "ol.datescheduled"
+        column: "NEXT PAROLE COMM. REVIEW DATE"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss","yyyy-MM-dd HH:mm:ss.S"]
+      ol.datetimeeligible:
+        type: "ol.datetimeeligible"
+        column: "FINAL RULING PED"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss","yyyy-MM-dd HH:mm:ss.S"]
+      ol.statusdetails:
+        type: "ol.statusdetails"
+        column: "PAROLE AND TERMINATE STATUS"
+      ol.timecomputedstatus:
+        type: "ol.timecomputedstatus"
+        transforms:
+        - !<transforms.BooleanRegexTransform>
+          column: "INMATE TIME COMP STATUS CODE"
+          pattern: "\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?"
+          transformsIfFalse:
+          - !<transforms.ColumnTransform>
+            column: "INMATE TIME COMP STATUS CODE"
+          transformsIfTrue:
+          - !<transforms.ValueTransform>
+            value: ""
+      ol.type:
+        type: "ol.type"
+        transforms:
+        - !<transforms.BooleanRegexTransform>
+          column: "NEXT PAROLE REVIEW TYPE CODE"
+          pattern: "\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?"
+          transformsIfFalse:
+          - !<transforms.ColumnTransform>
+            column: "NEXT PAROLE REVIEW TYPE CODE"
+          transformsIfTrue:
+          - !<transforms.ValueTransform>
+            value: ""
+    conditions:
+    - !<conditions.ConditionalOr> {}
+    - !<conditions.BooleanIsNullCondition>
+      column: "FINAL RULING PED"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "PAROLE AND TERMINATE STATUS"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "NEXT PAROLE REVIEW TYPE CODE"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "NEXT PAROLE COMM. REVIEW DATE"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "INMATE TIME COMP STATUS CODE"
+      reverse: True
+    name: "parolereview"
+
+  sentence:
+    fqn: "ol.sentence"
+    entitySetName: "GuilfordSentences_DPS"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ValueTransform>
+          value: "convicted"
+      ol.convictionresults:
+        type: "ol.convictionresults"
+        transforms:
+        - !<transforms.ValueTransform>
+          value: "convicted"
+    name: "sentence"
+
+  sentencecomponent:
+    fqn: "ol.sentencecomponent"
+    entitySetName: "GuilfordSentenceComponents"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["OFFENDER NC DOC ID NUMBER", "CURRENT SENTENCE COMPONENT"]
+      ol.commitment:
+        type: "ol.commitment"
+        column: "CURRENT COMMITMENT PREFIX"
+      ol.number:
+        type: "ol.number"
+        column: "CURRENT SENTENCE COMPONENT"
+        transforms:
+        - !<transforms.ParseIntTransform> {}
+    conditions:
+    - !<conditions.ConditionalOr> {}
+    - !<conditions.BooleanIsNullCondition>
+      column: "OFFENDER NC DOC ID NUMBER"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "CURRENT SENTENCE COMPONENT"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "CURRENT COMMITMENT PREFIX"
+      reverse: True
+    name: "sentencecomponent"
+
+
+  sentenceterm:
+    fqn: "ol.sentenceterm"
+    entitySetName: "GuilfordSentenceTerms_DPS"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["INMATE DOC NUMBER", "TERM OF INCARCERATION(IN DAYS)"]
+      ol.maximumdatetime:
+        type: "ol.maximumdatetime"
+        column: "FINAL RULING MAX RELEASE DATE"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss","yyyy-MM-dd HH:mm:ss.S"]
+      ol.value:
+        type: "ol.value"
+        column: "TERM OF INCARCERATION(IN DAYS)"
+        transforms:
+        - !<transforms.ParseIntTransform> {}
+      ol.units:
+        type: "ol.units"
+        transforms:
+        - !<transforms.ValueTransform>
+          value: "days"
+    conditions:
+    - !<conditions.ConditionalOr> {}
+    - !<conditions.BooleanIsNullCondition>
+      column: "TERM OF INCARCERATION"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "FINAL RULING MAX RELEASE DATE"
+      reverse: True
+    name: "sentenceterm"
+
+
+associationDefinitions:
+
+  assessedby:
+    fqn: "ol.assessedby"
+    entitySetName: "GuilfordAssessedBy"
+    src: "inmateclassification"
+    dst: "diagnostic_center"
+    propertyDefinitions:
+      general.id:
+        type: "general.id"
+        transforms:
+        - !<transforms.HashTransform>
+          columns: ["INMATE DOC ID", "NEXT CUSTODY REVIEW DATE", "CUSTODY CLASS CODE", "ADMITTING DIAGNOSTIC CENTER", "INMATE CONTROL STATUS CODE"]
+          hashFunction: "sha256"
+    name: "assessedby"
+
+  administered:
+    fqn: "ol.administered"
+    entitySetName: "GuilfordAdministered"
+    src: "paroleanalyst"
+    dst: "parolereview"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatCombineTransform>
+          transforms:
+          - !<transforms.HashTransform>
+            columns: ["PAROLE CASE ANALYST", "FINAL RULING PED", "INMATE TIME COMP STATUS CODE", "PAROLE AND TERMINATE STATUS", "NEXT PAROLE REVIEW TYPE CODE", "NEXT PAROLE COMM. REVIEW DATE"]
+            hashFunction: "sha256"
+          - !<transforms.ValueTransform>
+            value: "1"
+    name: "administered"
+
+  assignedto:
+    fqn: "ol.assignedto"
+    entitySetName: "GuilfordAssignedTo"
+    src: "inmate"
+    dst: "inmateclassification"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatCombineTransform>
+          transforms:
+          - !<transforms.HashTransform>
+            columns: ["CUSTODY CLASS CODE", "NEXT CUSTODY REVIEW DATE", "INMATE CONTROL STATUS CODE", "INMATE DOC NUMBER"]
+            hashFunction: "sha256"
+          - !<transforms.ValueTransform>
+            value: "1"
+    name: "assignedto"
+
+  chargedwith1:
+    fqn: "ol.chargedwith"
+    entitySetName: "GuilfordChargedWith"
+    src: "inmate"
+    dst: "charge"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatCombineTransform>
+          transforms:
+          - !<transforms.HashTransform>
+            columns: ["MOST SERIOUS OFFNSE CURR INCAR", "INMATE DOC NUMBER"]
+            hashFunction: "sha256"
+          - !<transforms.ValueTransform>
+            value: "1"
+    name: "chargedwith1"
+
+  chargedwith2:
+    fqn: "ol.chargedwith"
+    entitySetName: "GuilfordChargedWith"
+    src: "inmate"
+    dst: "chargehistory"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatCombineTransform>
+          transforms:
+          - !<transforms.HashTransform>
+            columns: ["MOST SERIOUS OFFNSE CURR INCAR", "INMATE DOC NUMBER"]
+            hashFunction: "sha256"
+          - !<transforms.ValueTransform>
+            value: "2"
+    name: "chargedwith2"
+
+  locatedat:
+    fqn: "ol.locatedat"
+    entitySetName: "GuilfordLocatedAt"
+    src: "jailstay"
+    dst: "incarceration_facility"
+    propertyDefinitions:
+      general.id:
+        type: "general.id"
+        transforms:
+        - !<transforms.HashTransform>
+          columns: ["INMATE DOC NUMBER", "INMATE ADMISSION DATE", "INMATE FACILITY CODE"]
+          hashFunction: "sha256"
+    name: "locatedat"
+
+  oflength1:
+    fqn: "ol.oflength"
+    entitySetName: "GuilfordOfLength"
+    src: "jailstay"
+    dst: "jailstaylength"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatCombineTransform>
+          transforms:
+          - !<transforms.HashTransform>
+            columns: ["DAYS SERVED IN DOC CUSTODY", "FINAL RULING MAX RELEASE DATE", "INMATE ADMISSION DATE", "INMATE DOC NUMBER"]
+            hashFunction: "sha256"
+          - !<transforms.ValueTransform>
+            value: "1"
+    name: "oflength1"
+
+  oflength2:
+    fqn: "ol.oflength"
+    entitySetName: "GuilfordOfLength"
+    src: "sentence"
+    dst: "sentenceterm"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatCombineTransform>
+          transforms:
+          - !<transforms.HashTransform>
+            columns: ["TERM OF INCARCERATION", "INMATE DOC NUMBER"]
+            hashFunction: "sha256"
+          - !<transforms.ValueTransform>
+            value: "2"
+    name: "oflength2"
+
+  partof1:
+    fqn: "ol.partof"
+    entitySetName: "GuilfordPartOf"
+    src: "parolereview"
+    dst: "jailstay"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatCombineTransform>
+          transforms:
+          - !<transforms.HashTransform>
+            columns: ["FINAL RULING PED", "INMATE TIME COMP STATUS CODE", "PAROLE AND TERMINATE STATUS", "NEXT PAROLE REVIEW TYPE CODE", "NEXT PAROLE COMM. REVIEW DATE", "INMATE ADMISSION DATE", "INMATE DOC NUMBER"]
+            hashFunction: "sha256"
+          - !<transforms.ValueTransform>
+            value: "1"
+    name: "partof1"
+
+  partof2:
+    fqn: "ol.partof"
+    entitySetName: "GuilfordPartOf"
+    src: "inmateclassification"
+    dst: "jailstay"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatCombineTransform>
+          transforms:
+          - !<transforms.HashTransform>
+            columns: ["NEXT CUSTODY REVIEW DATE", "INMATE CONTROL STATUS CODE", "CUSTODY CLASS CODE", "INMATE ADMISSION DATE", "INMATE DOC NUMBER"]
+            hashFunction: "sha256"
+          - !<transforms.ValueTransform>
+            value: "2"
+    name: "partof2"
+
+  relatedto1:
+    fqn: "ol.relatedto"
+    entitySetName: "GuilfordRelatedTo"
+    src: "arrest"
+    dst: "parolereview"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatCombineTransform>
+          transforms:
+          - !<transforms.HashTransform>
+            columns: ["FINAL RULING PED", "DATE OF LAST ARREST ON PAROLE", "INMATE TIME COMP STATUS CODE", "PAROLE AND TERMINATE STATUS", "NEXT PAROLE REVIEW TYPE CODE", "NEXT PAROLE COMM. REVIEW DATE"]
+            hashFunction: "sha256"
+          - !<transforms.ValueTransform>
+            value: "1"
+    name: "relatedto1"
+
+  relatedto2:
+    fqn: "ol.relatedto"
+    entitySetName: "GuilfordRelatedTo"
+    src: "notification"
+    dst: "jailstay"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatCombineTransform>
+          transforms:
+          - !<transforms.HashTransform>
+            columns: ["INMATE ADMISSION DATE", "LATEST DISCIPLINE INFRACTION", "LAST DISCIPLINE INFRACTION DT.", "INMATE DOC NUMBER"]
+            hashFunction: "sha256"
+          - !<transforms.ValueTransform>
+            value: "2"
+    name: "relatedto2"
+
+  relatedto3:
+    fqn: "ol.relatedto"
+    entitySetName: "GuilfordRelatedTo"
+    src: "sentencecomponent"
+    dst: "sentence"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatCombineTransform>
+          transforms:
+          - !<transforms.ColumnTransform>
+            column: "INMATE DOC NUMBER"
+          - !<transforms.ValueTransform>
+            value: "3"
+    name: "relatedto3"
+
+  reported:
+    fqn: "ol.reported"
+    entitySetName: "GuilfordReported"
+    src: "inmate"
+    dst: "incarcerationhistory"
+    propertyDefinitions:
+      general.id:
+        type: "general.id"
+        column: "INMATE DOC NUMBER"
+    name: "reported"
+
+  resultsin1:
+    fqn: "ol.resultsin"
+    entitySetName: "GuilfordResultsIn"
+    src: "chargehistory"
+    dst: "sentence"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "MOST SERIOUS OFFNSE CURR INCAR"
+    name: "resultsin1"
+
+  resultsin2:
+    fqn: "ol.resultsin"
+    entitySetName: "GuilfordResultsIn"
+    src: "charge"
+    dst: "oldestsentence"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "INMATE DOC NUMBER"
+    name: "resultsin2"
+
+  screenedwith:
+    fqn: "ol.screenedwith"
+    entitySetName: "GuilfordScreenedWith"
+    src: "inmate"
+    dst: "parolereview"
+    propertyDefinitions:
+      general.id:
+        type: "general.id"
+        transforms:
+        - !<transforms.HashTransform>
+          columns: ["FINAL RULING PED", "INMATE TIME COMP STATUS CODE", "PAROLE AND TERMINATE STATUS", "NEXT PAROLE REVIEW TYPE CODE", "NEXT PAROLE COMM. REVIEW DATE", "INMATE DOC NUMBER"]
+          hashFunction: "sha256"
+    name: "screenedwith"
+
+  sentencedwith1:
+    fqn: "ol.sentencedwith"
+    entitySetName: "GuilfordSentencedWith"
+    src: "inmate"
+    dst: "sentence"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatCombineTransform>
+          transforms:
+          - !<transforms.ColumnTransform>
+            column: "INMATE DOC NUMBER"
+          - !<transforms.ValueTransform>
+            value: "1"
+    name: "sentencedwith1"
+
+  sentencedwith2:
+    fqn: "ol.sentencedwith"
+    entitySetName: "GuilfordSentencedWith"
+    src: "inmate"
+    dst: "sentenceterm"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatCombineTransform>
+          transforms:
+          - !<transforms.HashTransform>
+            columns: ["TERM OF INCARCERATION", "INMATE DOC NUMBER"]
+            hashFunction: "sha256"
+          - !<transforms.ValueTransform>
+            value: "2"
+    name: "sentencedwith2"
+
+  sentencedwith3:
+    fqn: "ol.sentencedwith"
+    entitySetName: "GuilfordSentencedWith"
+    src: "inmate"
+    dst: "oldestsentence"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatCombineTransform>
+          transforms:
+          - !<transforms.ColumnTransform>
+            column: "INMATE DOC NUMBER"
+          - !<transforms.ValueTransform>
+            value: "3"
+    name: "sentencedwith3"
+
+  subjectof1:
+    fqn: "ol.subjectof"
+    entitySetName: "GuilfordSubjectOf"
+    src: "inmate"
+    dst: "jailstay"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatCombineTransform>
+          transforms:
+          - !<transforms.HashTransform>
+            columns: ["INMATE ADMISSION DATE", "INMATE DOC NUMBER"]
+            hashFunction: "sha256"
+          - !<transforms.ValueTransform>
+            value: "1"
+    name: "subjectof1"
+
+  subjectof2:
+    fqn: "ol.subjectof"
+    entitySetName: "GuilfordSubjectOf"
+    src: "inmate"
+    dst: "notification"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatCombineTransform>
+          transforms:
+          - !<transforms.HashTransform>
+            columns: ["LATEST DISCIPLINE INFRACTION", "LAST DISCIPLINE INFRACTION DT.", "INMATE DOC NUMBER"]
+            hashFunction: "sha256"
+          - !<transforms.ValueTransform>
+            value: "2"
+    name: "subjectof2"
+
+
