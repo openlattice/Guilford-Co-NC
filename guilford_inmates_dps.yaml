@@ -18,9 +18,10 @@ entityDefinitions:
       nc.PersonEthnicity:
         type: "nc.PersonEthnicity"
         transforms:
-        - !<transforms.ReplaceTransform>
+        - !<transforms.ColumnTransform>
           column: "INMATE ETHNIC AFFILIATION"
-          target: ['UNKNOWN', 'EUROPEAN/N.AM./AUSTR', 'AFRICAN', 'ASIAN', 'OTHER', 'HISPANIC/LATINO', 'AMERICAN INDIAN', 'SLAVIC (E. EUROPEAN)', 'PACIFIC ISLANDER', 'ORIENTAL', 'NORDIC/SCANDANAVIAN', '??????????????????????????????']
+        - !<transforms.ReplaceTransform>
+          target: ['UNKNOWN', 'EUROPEAN/N.AM./AUSTR', 'AFRICAN', 'ASIAN', 'OTHER', 'HISPANIC/LATINO', 'AMERICAN INDIAN', 'SLAVIC (E. EUROPEAN)', 'PACIFIC ISLANDER', 'ORIENTAL', 'NORDIC/SCANDANAVIAN', '\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?']
           goal: ['', '', '', '', '', 'hispanic', '', '', '', '', '', '']
       nc.PersonRace:
         type: "nc.PersonRace"
@@ -29,14 +30,16 @@ entityDefinitions:
           column: "INMATE RACE CODE"
           pattern: "OTHER"
           transformsIfTrue:
-          - !<transforms.ReplaceTransform>
+          - !<transforms.ColumnTransform>
             column: "INMATE ETHNIC AFFILIATION"
-            target: ['UNKNOWN', 'EUROPEAN/N.AM./AUSTR', 'AFRICAN', 'ASIAN', 'OTHER', 'HISPANIC/LATINO', 'AMERICAN INDIAN', 'SLAVIC (E. EUROPEAN)', 'PACIFIC ISLANDER', 'ORIENTAL', 'NORDIC/SCANDANAVIAN', '??????????????????????????????']
+          - !<transforms.ReplaceTransform>
+            target: ['UNKNOWN', 'EUROPEAN/N.AM./AUSTR', 'AFRICAN', 'ASIAN', 'OTHER', 'HISPANIC/LATINO', 'AMERICAN INDIAN', 'SLAVIC (E. EUROPEAN)', 'PACIFIC ISLANDER', 'ORIENTAL', 'NORDIC/SCANDANAVIAN', '\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?']
             goal: ['', '', '', '', '', '', 'amindian', '', 'pacisland', '', '', '']
           transformsIfFalse:
-          - !<transforms.ReplaceTransform>
+          - !<transforms.ColumnTransform>
             column: "INMATE RACE CODE"
-            target: ['WHITE', 'BLACK', 'OTHER', 'INDIAN', 'ASIAN/ORTL', '??????????????????????????????', 'UNKNOWN']
+          - !<transforms.ReplaceTransform>
+            target: ['WHITE', 'BLACK', 'OTHER', 'INDIAN', 'ASIAN/ORTL', '\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?', 'UNKNOWN']
             goal: ['white', 'black', 'other', 'asian', 'asian', '', '']
       nc.PersonGivenName:
         type: "nc.PersonGivenName"
@@ -57,8 +60,8 @@ entityDefinitions:
       ol.datasource:
         type: "ol.datasource"
         transforms:
-        - !<transforms.ColumnTransform>
-          column: "NC DPS"
+        - !<transforms.ValueTransform>
+          value: "NC DPS"
     conditions:
     - !<conditions.ConditionalOr> {}
     - !<conditions.BooleanIsNullCondition>
@@ -231,7 +234,6 @@ entityDefinitions:
             value: ""
       ol.name:
         type: "ol.name"
-        column: "INMATE FACILITY CODE"
         transforms:
         - !<transforms.BooleanRegexTransform>
           column: "INMATE FACILITY CODE"
@@ -252,6 +254,7 @@ entityDefinitions:
       pattern: "\\?"
       reverse: True
     name: "incarceration_facility"
+
 
   incarcerationhistory:
     fqn: "ol.incarcerationhistory"
@@ -279,6 +282,7 @@ entityDefinitions:
       column: "ESCAPE HISTORY FLAG"
       reverse: True
     name: "incarcerationhistory"
+
 
   inmateclassification:
     fqn: "ol.inmateclassification"
@@ -316,7 +320,6 @@ entityDefinitions:
     name: "inmateclassification"
 
 
-  #this is the first DPS flight to include jailstay, so ongoing pk convention is decided here.
   jailstay:
     fqn: "ol.jailstay"
     entitySetName: "GuilfordJailStays_DPS"
@@ -355,15 +358,27 @@ entityDefinitions:
         column: "INMATE SPECIAL CHARACTERISTICS"
       ol.releasedatetime:
         type: "ol.releasedatetime"
-        column: "DATE OF LAST INMATE MOVEMENT"
         transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["DATE OF LAST INMATE MOVEMENT", "TIME OF LAST MOVEMENT"]
+        - !<transforms.ReplaceRegexTransform>
+          target: "T"
+          goal: " "
         - !<transforms.DateTimeTransform>
-          pattern: ["yyyy-MM-dd HH:mm:ss","yyyy-MM-dd HH:mm:ss.S"]
+          pattern: ["yyyy-MM-dd 00:00:00-HH:mm:ss", "yyyy-MM-dd 00:00:00-HH:mm:ss.S", "yyyy-MM-dd 00:00:00.0-HH:mm:ss", "yyyy-MM-dd 00:00:00.0-HH:mm:ss.S"]
       ol.totalinfractioncount:
         type: "ol.totalinfractioncount"
-        column: "TOTAL DISCIPLINE INFRACTIONS"
         transforms:
-        - !<transforms.ParseIntTransform> {}
+        - !<transforms.BooleanRegexTransform>
+          column: "TOTAL DISCIPLINE INFRACTIONS"
+          pattern: "0-1"
+          transformsIfFalse:
+          - !<transforms.ColumnTransform>
+            column: "TOTAL DISCIPLINE INFRACTIONS"
+          - !<transforms.ParseIntTransform> {}
+          transformsIfTrue:
+          - !<transforms.ValueTransform>
+            value: ""
       ol.totalsentencecount:
         type: "ol.totalsentencecount"
         column: "TOTAL SENTENCE COUNT"
@@ -377,6 +392,7 @@ entityDefinitions:
       column: "INMATE DOC NUMBER"
       reverse: True
     name: "jailstay"
+
 
   jailstaylength:
     fqn: "ol.jailstaylength"
@@ -392,10 +408,14 @@ entityDefinitions:
         - !<transforms.ParseIntTransform> {}
       ol.datetime_release:
         type: "ol.datetime_release"
-        column: "DATE OF LAST INMATE MOVEMENT"
         transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["DATE OF LAST INMATE MOVEMENT", "TIME OF LAST MOVEMENT"]
+        - !<transforms.ReplaceRegexTransform>
+          target: "T"
+          goal: " "
         - !<transforms.DateTimeTransform>
-          pattern: ["yyyy-MM-dd HH:mm:ss","yyyy-MM-dd HH:mm:ss.S"]
+          pattern: ["yyyy-MM-dd 00:00:00-HH:mm:ss", "yyyy-MM-dd 00:00:00-HH:mm:ss.S", "yyyy-MM-dd 00:00:00.0-HH:mm:ss", "yyyy-MM-dd 00:00:00.0-HH:mm:ss.S"]
       ol.projectedreleasedatetime:
         type: "ol.projectedreleasedatetime"
         column: "FINAL RULING MAX RELEASE DATE"
@@ -592,7 +612,7 @@ entityDefinitions:
         type: "ol.id"
         transforms:
         - !<transforms.ConcatTransform>
-          columns: ["OFFENDER NC DOC ID NUMBER", "CURRENT SENTENCE COMPONENT"]
+          columns: ["INMATE DOC NUMBER", "CURRENT SENTENCE COMPONENT"]
       ol.commitment:
         type: "ol.commitment"
         column: "CURRENT COMMITMENT PREFIX"
@@ -604,7 +624,7 @@ entityDefinitions:
     conditions:
     - !<conditions.ConditionalOr> {}
     - !<conditions.BooleanIsNullCondition>
-      column: "OFFENDER NC DOC ID NUMBER"
+      column: "INMATE DOC NUMBER"
       reverse: True
     - !<conditions.BooleanIsNullCondition>
       column: "CURRENT SENTENCE COMPONENT"
@@ -632,9 +652,17 @@ entityDefinitions:
           pattern: ["yyyy-MM-dd HH:mm:ss","yyyy-MM-dd HH:mm:ss.S"]
       ol.value:
         type: "ol.value"
-        column: "TERM OF INCARCERATION(IN DAYS)"
         transforms:
-        - !<transforms.ParseIntTransform> {}
+        - !<transforms.BooleanRegexTransform>
+          column: "TERM OF INCARCERATION(IN DAYS)"
+          pattern: "\\?"
+          transformsIfFalse:
+          - !<transforms.ColumnTransform>
+            column: "TERM OF INCARCERATION(IN DAYS)"
+          - !<transforms.ParseIntTransform> {}
+          transformsIfTrue:
+          - !<transforms.ValueTransform>
+            value: ""
       ol.units:
         type: "ol.units"
         transforms:
@@ -643,10 +671,10 @@ entityDefinitions:
     conditions:
     - !<conditions.ConditionalOr> {}
     - !<conditions.BooleanIsNullCondition>
-      column: "TERM OF INCARCERATION"
+      column: "FINAL RULING MAX RELEASE DATE"
       reverse: True
     - !<conditions.BooleanIsNullCondition>
-      column: "FINAL RULING MAX RELEASE DATE"
+      column: "TERM OF INCARCERATION"
       reverse: True
     name: "sentenceterm"
 
