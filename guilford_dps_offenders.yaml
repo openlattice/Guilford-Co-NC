@@ -72,7 +72,7 @@ entityDefinitions:
         type: "ol.datasource"
         transforms:
         - !<transforms.ValueTransform>
-          value: "Guilford Co. DPS"
+          value: "NC DPS"
     name: "offender"
 
   offenderappearance:
