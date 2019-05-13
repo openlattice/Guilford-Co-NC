@@ -328,8 +328,9 @@ associationDefinitions:
           transforms:
           - !<transforms.ColumnTransform>
             column: "OFFENDER NC DOC ID NUMBER"
-          - !<transforms.ValueTransform>
-            value: "_offender_appearance"
+          - !<transforms.ConcatTransform>
+            columns: ["OFFENDER HEIGHT (IN INCHES)", "OFFENDER WEIGHT (IN LBS)", "OFFENDER SKIN COMPLEXION CODE","OFFENDER HAIR COLOR CODE", "OFFENDER BODY BUILD CODE", "OFFENDER EYE COLOR CODE"]
+            separator: "_"
     name: "has1"
 
   has2:
@@ -345,8 +346,8 @@ associationDefinitions:
           transforms:
           - !<transforms.ColumnTransform>
             column: "OFFENDER NC DOC ID NUMBER"
-          - !<transforms.ValueTransform>
-            value: "_offender_immigration"
+          - !<transforms.ColumnTransform>
+            column: "OFFENDER CITIZENSHIP CODE"
     name: "has2"
 
   reported:
@@ -362,8 +363,8 @@ associationDefinitions:
           transforms:
           - !<transforms.ColumnTransform>
             column: "OFFENDER NC DOC ID NUMBER"
-          - !<transforms.ValueTransform>
-            value: "_offender_communication"
+          - !<transforms.ColumnTransform>
+            column: "OFFENDER PRIMARY LANGUAGE CODE"
     name: "reported"
 
   bornat:
@@ -379,6 +380,7 @@ associationDefinitions:
           transforms:
           - !<transforms.ColumnTransform>
             column: "OFFENDER NC DOC ID NUMBER"
-          - !<transforms.ValueTransform>
-            value: "_offender_birthplace"
+          - !<transforms.ConcatTransform>
+            separator: "_"
+            columns: ["CITY WHERE OFFENDER BORN", "NC COUNTY WHERE OFFENDER BORN", "STATE WHERE OFFENDER BORN","COUNTRY WHERE OFFENDER BORN"]
     name: "bornat"
