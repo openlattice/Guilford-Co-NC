@@ -21,7 +21,7 @@ entityDefinitions:
         - !<transforms.ColumnTransform>
           column: "INMATE ETHNIC AFFILIATION"
         - !<transforms.ReplaceTransform>
-          target: ['UNKNOWN', 'EUROPEAN/N.AM./AUSTR', 'AFRICAN', 'ASIAN', 'OTHER', 'HISPANIC/LATINO', 'AMERICAN INDIAN', 'SLAVIC (E. EUROPEAN)', 'PACIFIC ISLANDER', 'ORIENTAL', 'NORDIC/SCANDANAVIAN', '\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?']
+          target: ['UNKNOWN', 'EUROPEAN/N.AM./AUSTR', 'AFRICAN', 'ASIAN', 'OTHER', 'HISPANIC/LATINO', 'AMERICAN INDIAN', 'SLAVIC (E. EUROPEAN)', 'PACIFIC ISLANDER', 'ORIENTAL', 'NORDIC/SCANDANAVIAN', "\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?"]
           goal: ['', '', '', '', '', 'hispanic', '', '', '', '', '', '']
       nc.PersonRace:
         type: "nc.PersonRace"
@@ -400,28 +400,25 @@ entityDefinitions:
     propertyDefinitions:
       ol.id:
         type: "ol.id"
-        column: "DAYS SERVED IN DOC CUSTODY"
+        transforms:
+        - !<transforms.ConcatCombineTransform>
+          transforms:
+          - !<transforms.BooleanRegexTransform>
+            column: "GT RATE / ET LEVEL CODE"
+            pattern: "\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?\\?"
+            transformsIfFalse:
+            - !<transforms.ColumnTransform>
+              column: "GT RATE / ET LEVEL CODE"
+            transformsIfTrue:
+            - !<transforms.ValueTransform>
+              value: ""
+          - !<transforms.ColumnTransform>
+            column: "DAYS SERVED IN DOC CUSTODY"
       criminaljustice.timeserveddays:
         type: "criminaljustice.timeserveddays"
         column: "DAYS SERVED IN DOC CUSTODY"
         transforms:
         - !<transforms.ParseIntTransform> {}
-      ol.datetime_release:
-        type: "ol.datetime_release"
-        transforms:
-        - !<transforms.ConcatTransform>
-          columns: ["DATE OF LAST INMATE MOVEMENT", "TIME OF LAST MOVEMENT"]
-        - !<transforms.ReplaceRegexTransform>
-          target: "T"
-          goal: " "
-        - !<transforms.DateTimeTransform>
-          pattern: ["yyyy-MM-dd 00:00:00-HH:mm:ss", "yyyy-MM-dd 00:00:00-HH:mm:ss.S", "yyyy-MM-dd 00:00:00.0-HH:mm:ss", "yyyy-MM-dd 00:00:00.0-HH:mm:ss.S"]
-      ol.projectedreleasedatetime:
-        type: "ol.projectedreleasedatetime"
-        column: "FINAL RULING MAX RELEASE DATE"
-        transforms:
-        - !<transforms.DateTimeTransform>
-          pattern: ["yyyy-MM-dd HH:mm:ss","yyyy-MM-dd HH:mm:ss.S"]
       ol.earnedtimerate:
         type: "ol.earnedtimerate"
         transforms:
@@ -677,6 +674,7 @@ entityDefinitions:
       column: "TERM OF INCARCERATION"
       reverse: True
     name: "sentenceterm"
+
 
 
 associationDefinitions:
@@ -1040,5 +1038,6 @@ associationDefinitions:
           - !<transforms.ValueTransform>
             value: "2"
     name: "subjectof2"
+
 
 
