@@ -1,0 +1,145 @@
+
+
+
+entityDefinitions:
+
+  spec_prov_sanctions:
+    fqn: "ol.notification"
+    entitySetName: "GuilfordSpecialProvisionsAndSanctions"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "SPECIAL PROVISION/SANCTION CD"
+      ol.description:
+        type: "ol.description"
+        column: "SPECIAL PROVISION/SANCTION CD"
+      ol.completed:
+        type: "ol.completed"
+        transforms:
+        - !<transforms.ParseBoolTransform> {}
+      general.datetime:
+        type: "general.datetime"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["DATE OF LAST UPDATE", "TIME OF LAST UPDATE"]
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd 00:00:00-HH:mm:ss.S", "yyyy-MM-dd 00:00:00-HH:mm:ss"]
+      ol.number:
+        type: "ol.number"
+        column: "SPECIAL CONDITION SEQUENCE NO."
+        transforms:
+        - !<transforms.ParseIntTransform> {}
+    conditions:
+    - !<conditions.ConditionalOr> {}
+    - !<conditions.BooleanIsNullCondition>
+      column: "SPECIAL CONDITION SEQUENCE NO."
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "DATE OF LAST UPDATE"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "SPECIAL PROVISION/SANCTION CD"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "TIME OF LAST UPDATE"
+      reverse: True
+    name: "spec_prov_sanctions"
+
+
+  offender:
+    fqn: "general.person"
+    entitySetName: "GuilfordOffenders"
+    propertyDefinitions:
+      nc.SubjectIdentification:
+        type: "nc.SubjectIdentification"
+        transforms:
+        - !<transforms.BooleanRegexTransform>
+          pattern: "^\\d{6}$"
+          transformsIfFalse:
+          - !<transforms.ColumnTransform>
+            column: "OFFENDER NC DOC ID NUMBER"
+          transformsIfTrue:
+          - !<transforms.ConcatCombineTransform>
+            transforms:
+            - !<transforms.ValueTransform>
+              value: "0"
+            - !<transforms.ColumnTransform>
+              column: "OFFENDER NC DOC ID NUMBER"
+      ol.datasource:
+        type: "ol.datasource"
+        transforms:
+        - !<transforms.ValueTransform>
+          value: "NC DPS"
+    conditions:
+    - !<conditions.BooleanIsNullCondition>
+      column: "OFFENDER NC DOC ID NUMBER"
+      reverse: True
+    name: "offender"
+
+
+  sentencecomponent:
+    fqn: "ol.sentencecomponent"
+    entitySetName: "GuilfordSentenceComponents"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatCombineTransform>
+          transforms:
+          - !<transforms.BooleanRegexTransform>
+            pattern: "^\\d{6}$"
+            transformsIfFalse:
+            - !<transforms.ColumnTransform>
+              column: "OFFENDER NC DOC ID NUMBER"
+            transformsIfTrue:
+            - !<transforms.ConcatCombineTransform>
+              transforms:
+              - !<transforms.ValueTransform>
+                value: "0"
+              - !<transforms.ColumnTransform>
+                column: "OFFENDER NC DOC ID NUMBER"
+          - !<transforms.ColumnTransform>
+            column: "SENTENCE COMPONENT NUMBER"
+      ol.commitment:
+        type: "ol.commitment"
+        column: "COMMITMENT PREFIX"
+    conditions:
+    - !<conditions.ConditionalOr> {}
+    - !<conditions.BooleanIsNullCondition>
+      column: "SENTENCE COMPONENT NUMBER"
+      reverse: True
+    - !<conditions.BooleanIsNullCondition>
+      column: "COMMITMENT PREFIX"
+      reverse: True
+    name: "sentencecomponent"
+
+
+associationDefinitions:
+
+  relatedto:
+    fqn: "ol.relatedto"
+    entitySetName: "GuilfordRelatedTo"
+    src: "spec_prov_sanctions"
+    dst: "sentencecomponent"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.HashTransform>
+          columns: ["SENTENCE COMPONENT NUMBER", "OFFENDER NC DOC ID NUMBER", "SPECIAL PROVISION/SANCTION CD"]
+          hashFunction: "sha256"
+    name: "relatedto"
+
+  subjectof:
+    fqn: "ol.subjectof"
+    entitySetName: "GuilfordSubjectOf"
+    src: "offender"
+    dst: "spec_prov_sanctions"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.HashTransform>
+          columns: ["OFFENDER NC DOC ID NUMBER", "SPECIAL PROVISION/SANCTION CD"]
+          hashFunction: "sha256"
+    name: "subjectof"
