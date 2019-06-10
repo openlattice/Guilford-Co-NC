@@ -378,6 +378,7 @@ entityDefinitions:
         transforms:
         - !<transforms.DateTimeTransform>
           pattern: ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.S", "yyyy-MM-dd"]
+          timezone: "America/New York"
       ol.category:
         type: "ol.category"
         column: "colorcode" # outfit based on status- values: GEN, G, SUIC, 0GEN, TRUW, TRUB, JUV, ADMI
@@ -611,14 +612,33 @@ associationDefinitions:
           separator: "_"
     name: "chargedwith"
 
+  # registeredfor:
+  #   fqn: "general.registeredfor"
+  #   entitySetName: "GuilfordRegisteredFor"
+  #   src: "chargeevent"
+  #   dst: "charge"
+  #   # cyphers:
+  #   generator:
+  #   - !<generators.TransformSeriesGenerator>
+  #     transforms:
+  #     - !<transforms.ConcatTransform>
+  #       columns: ["arr_chrg", "chrg_seq", "ucr_code", "jjuvenile", "chrgdesc", "fel_misd"]
+  #       separator: "_"
+  #   propertyDefinitions:
+  #     ol.id:
+  #       type: "ol.id"
+  #       transforms:
+  #       - !<transforms.ConcatTransform>
+  #         columns: ["arr_chrg", "chrg_seq", "ucr_code", "jjuvenile", "chrgdesc", "fel_misd"]
+  #         separator: "_"
+  #   name: "registeredfor"
+
   registeredfor:
     fqn: "general.registeredfor"
     entitySetName: "GuilfordRegisteredFor"
     src: "chargeevent"
     dst: "charge"
-    # cyphers:
-    generator:
-    - !<generators.TransformSeriesGenerator>
+    generator: !<generators.TransformSeriesGenerator>
       transforms:
       - !<transforms.ConcatTransform>
         columns: ["arr_chrg", "chrg_seq", "ucr_code", "jjuvenile", "chrgdesc", "fel_misd"]
