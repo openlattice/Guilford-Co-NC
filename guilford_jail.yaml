@@ -616,14 +616,13 @@ associationDefinitions:
     entitySetName: "GuilfordRegisteredFor"
     src: "chargeevent"
     dst: "charge"
+    # cyphers:
     generator:
     - !<generators.TransformSeriesGenerator>
-      transformValueMapper:
-      - !<com.openlattice.shuttle.transformations.TransformValueMapper>
-        transforms:
-        - !<transforms.ConcatTransform>
-          columns: ["arr_chrg", "chrg_seq", "ucr_code", "jjuvenile", "chrgdesc", "fel_misd"]
-          separator: "_"
+      transforms:
+      - !<transforms.ConcatTransform>
+        columns: ["arr_chrg", "chrg_seq", "ucr_code", "jjuvenile", "chrgdesc", "fel_misd"]
+        separator: "_"
     propertyDefinitions:
       ol.id:
         type: "ol.id"
