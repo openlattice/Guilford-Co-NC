@@ -67,13 +67,20 @@ entityDefinitions:
       general.id:
         type: "general.id"
         column: "name_id"
-      person.juvenile: #int32
-        type: "person.juvenile" #int32
-        column: "jjuvenile"
+      person.juvenile: #bool
+        type: "person.juvenile" #bool
         transforms:
-        - !<transforms.ReplaceTransform>
-          target: ["A", "", "J"]
-          goal: ["0", "", "1"]
+        - !<transforms.BooleanContainsTransform>
+          column: "jjuvenile"
+          string: "J"
+          transformsIfTrue:
+          - !<transforms.ValueTransform>
+            value: true
+          - !<transforms.ParseBoolTransform> {}
+          transformsIfFalse:
+          - !<transforms.ValueTransform>
+            value: false
+          - !<transforms.ParseBoolTransform> {}
     conditions:
     - !<conditions.BooleanIsNullCondition>
       column: "jjuvenile"
@@ -118,7 +125,32 @@ entityDefinitions:
         column: "secrtyclas" # security classification - values: DS, AL, MX, MED, AS, GP
       ol.weekender:
         type: "ol.weekender"
-        column: "wkend"
+        transforms:
+        - !<transforms.BooleanContainsTransform>
+          column: "wkend"
+          string: "Y"
+          transformsIfTrue:
+          - !<transforms.ValueTransform>
+            value: true
+          - !<transforms.ParseBoolTransform> {}
+          transformsIfFalse:
+          - !<transforms.ValueTransform>
+            value: false
+          - !<transforms.ParseBoolTransform> {}
+      ol.type:
+        type: "ol.type"
+        column: "colorcode"
+    conditions:
+    - !<conditions.ConditionalOr> {}
+    - !<conditions.BooleanIsNullCondition>
+      column: "secrtyclas"
+      reverse: true
+    - !<conditions.BooleanIsNullCondition>
+      column: "wkend"
+      reverse: true
+    - !<conditions.BooleanIsNullCondition>
+      column: "colorcode"
+      reverse: true
     name: "inmateclassification"
 
   # residentlocation:
@@ -379,9 +411,9 @@ entityDefinitions:
         - !<transforms.DateTimeTransform>
           pattern: ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.S", "yyyy-MM-dd"]
           timezone: "America/New York"
-      ol.category:
-        type: "ol.category"
-        column: "colorcode" # outfit based on status- values: GEN, G, SUIC, 0GEN, TRUW, TRUB, JUV, ADMI
+      # ol.category:
+      #   type: "ol.category"
+      #   column: "colorcode" # outfit based on status- values: GEN, G, SUIC, 0GEN, TRUW, TRUB, JUV, ADMI
       ol.reasoncode:
         type: "ol.reasoncode"
         column: "confreason"
@@ -411,7 +443,7 @@ entityDefinitions:
         type: "ol.id"
         transforms:
         - !<transforms.ConcatTransform>
-          columns: ["arr_chrg", "chrg_seq", "ucr_code", "jjuvenile"]
+          columns: ["arr_chrg", "ucr_code", "jjuvenile"]
           separator: "_"
       ol.juveniles:
         type: "ol.juveniles"
@@ -430,9 +462,9 @@ entityDefinitions:
       ol.statestatute:
         type: "ol.statestatute"
         column: "arr_chrg"
-      ol.numberofcounts:
-        type: "ol.numberofcounts"
-        column: "chrg_seq"
+      # ol.numberofcounts:
+      #   type: "ol.numberofcounts"
+      #   column: "chrg_seq"
       ol.ucr:
         type: "ol.ucr"
         column: "ucr_code"
@@ -440,9 +472,6 @@ entityDefinitions:
     - !<conditions.ConditionalOr> {}
     - !<conditions.BooleanIsNullCondition>
       column: "arr_chrg"
-      reverse: true
-    - !<conditions.BooleanIsNullCondition>
-      column: "chrg_seq"
       reverse: true
     - !<conditions.BooleanIsNullCondition>
       column: "ucr_code"
@@ -608,30 +637,9 @@ associationDefinitions:
         type: "ol.id"
         transforms:
         - !<transforms.ConcatTransform>
-          columns: ["name_id", "arr_chrg", "chrg_seq", "ucr_code", "jjuvenile" ]
+          columns: ["name_id", "arr_chrg", "ucr_code", "jjuvenile" ]
           separator: "_"
     name: "chargedwith"
-
-  # registeredfor:
-  #   fqn: "general.registeredfor"
-  #   entitySetName: "GuilfordRegisteredFor"
-  #   src: "chargeevent"
-  #   dst: "charge"
-  #   # cyphers:
-  #   generator:
-  #   - !<generators.TransformSeriesGenerator>
-  #     transforms:
-  #     - !<transforms.ConcatTransform>
-  #       columns: ["arr_chrg", "chrg_seq", "ucr_code", "jjuvenile", "chrgdesc", "fel_misd"]
-  #       separator: "_"
-  #   propertyDefinitions:
-  #     ol.id:
-  #       type: "ol.id"
-  #       transforms:
-  #       - !<transforms.ConcatTransform>
-  #         columns: ["arr_chrg", "chrg_seq", "ucr_code", "jjuvenile", "chrgdesc", "fel_misd"]
-  #         separator: "_"
-  #   name: "registeredfor"
 
   registeredfor:
     fqn: "general.registeredfor"
@@ -641,14 +649,14 @@ associationDefinitions:
     generator: !<generators.TransformSeriesGenerator>
       transforms:
       - !<transforms.ConcatTransform>
-        columns: ["arr_chrg", "chrg_seq", "ucr_code", "jjuvenile", "chrgdesc", "fel_misd"]
+        columns: ["arr_chrg", "ucr_code", "jjuvenile", "chrgdesc", "fel_misd"]
         separator: "_"
     propertyDefinitions:
       ol.id:
         type: "ol.id"
         transforms:
         - !<transforms.ConcatTransform>
-          columns: ["arr_chrg", "chrg_seq", "ucr_code", "jjuvenile", "chrgdesc", "fel_misd"]
+          columns: ["arr_chrg", "ucr_code", "jjuvenile", "chrgdesc", "fel_misd"]
           separator: "_"
     name: "registeredfor"
 
@@ -676,7 +684,7 @@ associationDefinitions:
         type: "ol.id"
         transforms:
         - !<transforms.ConcatTransform>
-          columns: ["fel_misd", "chrgdesc", "arr_chrg", "chrg_seq", "ucr_code", "jjuvenile" ]
+          columns: ["fel_misd", "chrgdesc", "arr_chrg", "ucr_code", "jjuvenile" ]
           separator: "_"
     name: "resultsin1"
 
