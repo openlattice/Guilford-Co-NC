@@ -966,3 +966,22 @@ associationDefinitions:
           columns: ["chargetype", "fel_misd", "ucr_code", "chrgdesc", "arr_chrg", "arrDateTime"]
           separator: "_"
     name: "resultsin"
+
+  registeredfor:
+    fqn: "general.registeredfor"
+    entitySetName: "GuilfordRegisteredFor"
+    src: "chargeevent"
+    dst: "charge"
+    # generator: !<generators.TransformSeriesGenerator>
+    #   transforms:
+    #   - !<transforms.ConcatTransform>
+    #     columns: ["arr_chrg", "ucr_code", "jjuvenile", "chrgdesc", "fel_misd"]
+    #     separator: "_"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: [arr_chrg", "ucr_code", "arrDateTime", "chrgdesc", "fel_misd", "chargetype"]
+          separator: "_"
+    name: "registeredfor"
