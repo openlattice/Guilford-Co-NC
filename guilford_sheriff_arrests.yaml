@@ -972,16 +972,16 @@ associationDefinitions:
     entitySetName: "GuilfordRegisteredFor"
     src: "chargeevent"
     dst: "charge"
-    # generator: !<generators.TransformSeriesGenerator>
-    #   transforms:
-    #   - !<transforms.ConcatTransform>
-    #     columns: ["arr_chrg", "ucr_code", "jjuvenile", "chrgdesc", "fel_misd"]
-    #     separator: "_"
+    generator: !<generators.TransformSeriesGenerator>
+      transforms:
+      - !<transforms.ConcatTransform>
+        columns: ["arr_chrg", "ucr_code", "chrgdesc", "fel_misd"]
+        separator: "_"
     propertyDefinitions:
       ol.id:
         type: "ol.id"
         transforms:
         - !<transforms.ConcatTransform>
-          columns: [arr_chrg", "ucr_code", "arrDateTime", "chrgdesc", "fel_misd", "chargetype"]
+          columns: ["arr_chrg", "ucr_code", "arrDateTime", "chrgdesc", "fel_misd", "chargetype"]
           separator: "_"
     name: "registeredfor"
