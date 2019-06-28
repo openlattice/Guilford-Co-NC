@@ -1,6 +1,4 @@
 
-
-
 entityDefinitions:
 
   spec_prov_sanctions:
@@ -15,15 +13,9 @@ entityDefinitions:
         column: "SPECIAL PROVISION/SANCTION CD"
       ol.completed:
         type: "ol.completed"
+        column: "COMPLETION STATUS OF SANCTION"
         transforms:
         - !<transforms.ParseBoolTransform> {}
-      general.datetime:
-        type: "general.datetime"
-        transforms:
-        - !<transforms.ConcatTransform>
-          columns: ["DATE OF LAST UPDATE", "TIME OF LAST UPDATE"]
-        - !<transforms.DateTimeTransform>
-          pattern: ["yyyy-MM-dd 00:00:00-HH:mm:ss.S", "yyyy-MM-dd 00:00:00-HH:mm:ss"]
       ol.number:
         type: "ol.number"
         column: "SPECIAL CONDITION SEQUENCE NO."
@@ -35,16 +27,29 @@ entityDefinitions:
       column: "SPECIAL CONDITION SEQUENCE NO."
       reverse: True
     - !<conditions.BooleanIsNullCondition>
-      column: "DATE OF LAST UPDATE"
-      reverse: True
-    - !<conditions.BooleanIsNullCondition>
       column: "SPECIAL PROVISION/SANCTION CD"
-      reverse: True
-    - !<conditions.BooleanIsNullCondition>
-      column: "TIME OF LAST UPDATE"
       reverse: True
     name: "spec_prov_sanctions"
 
+  notificationevent:
+    fqn: "ol.notificationevent"
+    entitySetName: "GuilfordProvisionsSanctionsEvents"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["DATE OF LAST UPDATE", "TIME OF LAST UPDATE"]
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd 00:00:00.0-HH:mm:ss.S", "yyyy-MM-dd 00:00:00.0-HH:mm:ss"]
+      date.completeddatetime:
+        type: "date.completeddatetime"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["DATE OF LAST UPDATE", "TIME OF LAST UPDATE"]
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd 00:00:00.0-HH:mm:ss.S", "yyyy-MM-dd 00:00:00.0-HH:mm:ss"]
+    name: "notificationevent"
 
   offender:
     fqn: "general.person"
@@ -52,19 +57,13 @@ entityDefinitions:
     propertyDefinitions:
       nc.SubjectIdentification:
         type: "nc.SubjectIdentification"
+        column: "OFFENDER NC DOC ID NUMBER"
         transforms:
-        - !<transforms.BooleanRegexTransform>
-          pattern: "^\\d{6}$"
-          transformsIfFalse:
-          - !<transforms.ColumnTransform>
-            column: "OFFENDER NC DOC ID NUMBER"
-          transformsIfTrue:
-          - !<transforms.ConcatCombineTransform>
-            transforms:
-            - !<transforms.ValueTransform>
-              value: "0"
-            - !<transforms.ColumnTransform>
-              column: "OFFENDER NC DOC ID NUMBER"
+        - !<transforms.PaddingTransform>
+          pattern: "0"
+          length: 7
+          pre: true
+          cutoff: false
       ol.datasource:
         type: "ol.datasource"
         transforms:
@@ -76,7 +75,6 @@ entityDefinitions:
       reverse: True
     name: "offender"
 
-
   sentencecomponent:
     fqn: "ol.sentencecomponent"
     entitySetName: "GuilfordSentenceComponents"
@@ -86,18 +84,20 @@ entityDefinitions:
         transforms:
         - !<transforms.ConcatCombineTransform>
           transforms:
-          - !<transforms.BooleanRegexTransform>
-            pattern: "^\\d{6}$"
-            transformsIfFalse:
+          - !<transforms.BooleanContainsTransform>
+            column: "OFFENDER NC DOC ID NUMBER"
+            string: ""
+            transformsIfTrue:
             - !<transforms.ColumnTransform>
               column: "OFFENDER NC DOC ID NUMBER"
-            transformsIfTrue:
-            - !<transforms.ConcatCombineTransform>
-              transforms:
-              - !<transforms.ValueTransform>
-                value: "0"
-              - !<transforms.ColumnTransform>
-                column: "OFFENDER NC DOC ID NUMBER"
+            - !<transforms.PaddingTransform>
+              pattern: "0"
+              length: 7
+              pre: true
+              cutoff: false
+            transformsIfFalse:
+            - !<transforms.ValueTransform>
+              value: ""
           - !<transforms.ColumnTransform>
             column: "SENTENCE COMPONENT NUMBER"
       ol.commitment:
@@ -130,11 +130,26 @@ associationDefinitions:
           hashFunction: "sha256"
     name: "relatedto"
 
+  registeredfor:
+    fqn: "general.registeredfor"
+    entitySetName: "GuilfordRegisteredFor"
+    src: "notificationevent"
+    dst: "spec_prov_sanctions"
+    propertyDefinitions:
+      date.completeddatetime:
+        type: "date.completeddatetime"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["DATE OF LAST UPDATE", "TIME OF LAST UPDATE"]
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd 00:00:00.0-HH:mm:ss.S", "yyyy-MM-dd 00:00:00.0-HH:mm:ss"]
+    name: "registeredfor"
+
   subjectof:
     fqn: "ol.subjectof"
     entitySetName: "GuilfordSubjectOf"
     src: "offender"
-    dst: "spec_prov_sanctions"
+    dst: "notificationevent"
     propertyDefinitions:
       ol.id:
         type: "ol.id"
