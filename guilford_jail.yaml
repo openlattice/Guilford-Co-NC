@@ -437,7 +437,7 @@ entityDefinitions:
 
   chargeevent:
     fqn: "ol.chargeevent"
-    entitySetName: "GuilfordChargeEvent"
+    entitySetName: "GuilfordChargeEvents"
     propertyDefinitions:
       ol.id:
         type: "ol.id"
@@ -814,3 +814,17 @@ associationDefinitions:
           columns: ["docketno", "book_id"]
           separator: "_"
     name: "resultsin2"
+
+  partof:
+    fqn: "ol.partof"
+    entitySetName: "GuilfordPartOf"
+    src: "inmateclassification"
+    dst: "jailstay"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["secrtyclas", "wkend", "book_id"]
+          separator: "_"
+    name: "partof"
