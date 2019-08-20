@@ -1,0 +1,545 @@
+# select * from civil_process;
+
+
+entityDefinitions:
+  person:
+    fqn: "general.person"
+    entitySetName: "GuilfordPeople"
+    propertyDefinitions:
+      nc.SubjectIdentification:
+        type: "nc.SubjectIdentification"
+        transforms:
+        - !<transforms.HashTransform>
+          columns: ["name_desc"]
+          hashFunction: "sha256"
+      general.fullname:
+        type: "general.fullname"
+        column: "name_desc"
+      nc.PersonGivenName:
+        type: "nc.PersonGivenName"
+        column: "name_desc"
+        transforms:
+        - !<transforms.SplitTransform>
+          separator: " "
+          index: 1
+      nc.PersonSurName:
+        type: "nc.PersonSurName"
+        column: "name_desc"
+        transforms:
+        - !<transforms.SplitTransform>
+          separator: ","
+          index: 0
+      nc.PersonMiddleName:
+        type: "nc.PersonMiddleName"
+        column: "name_desc"
+        transforms:
+        - !<transforms.SplitTransform>
+          separator: " "
+          ifMoreThan: 3
+          index: 2
+      ol.datasource:
+        type: "ol.datasource"
+        transforms:
+        - !<transforms.ValueTransform>
+          value: "Guilford Co. Sheriff"
+    conditions:
+    - !<conditions.ConditionalAnd> {}
+    - !<conditions.BooleanRegexCondition>
+      column: "name_desc"
+      pattern: ","
+      reverse: false
+    - !<conditions.BooleanRegexCondition>
+      column: "name_desc"
+      pattern: "\\b LLC\\b"
+      reverse: true
+    - !<conditions.BooleanRegexCondition>
+      column: "name_desc"
+      pattern: "\\b INC\\b"
+      reverse: true
+    name: "person"
+
+  business:
+    fqn: "ol.organization"
+    entitySetName: "GuilfordBusinesses"
+    propertyDefinitions:
+      general.id:
+        type: "general.id"
+        transforms:
+        - !<transforms.HashTransform>
+          columns: ["name_desc"]
+          hashFunction: "sha256"
+      ol.organizationname:
+        type: "ol.organizationname"
+        column: "name_desc"
+    conditions:
+    - !<conditions.ConditionalOr> {}
+    - !<conditions.BooleanRegexCondition>
+      column: "name_desc"
+      pattern: "\\b LLC\\b"
+      reverse: false
+    - !<conditions.BooleanRegexCondition>
+      column: "name_desc"
+      pattern: "\\b INC\\b"
+      reverse: false
+    name: "business"
+
+  officer:
+    fqn: "ol.employee"
+    entitySetName: "GuilfordOfficers"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "officerid"
+      publicsafety.employeeid:
+        type: "publicsafety.employeeid"
+        column: "officerid"
+    conditions:
+    - !<conditions.BooleanIsNullCondition>
+      column: "officerid"
+      reverse: true
+    name: "officer"
+
+  agency:
+    fqn: "ol.agency"
+    entitySetName: "GuilfordAgencies"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "agency"
+      ol.name:
+        type: "ol.name"
+        column: "agency"
+    conditions:
+    - !<conditions.BooleanIsNullCondition>
+      column: "agency"
+      reverse: true
+    name: "agency"
+
+  disposition:
+    fqn: "ol.disposition"
+    entitySetName: "GuilfordDispositions"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "dispcode"
+      criminaljustice.disposition:
+        type: "criminaljustice.disposition"
+        column: "dispcode"
+    conditions:
+    - !<conditions.BooleanIsNullCondition>
+      column: "dispcode"
+      reverse: true
+    name: "disposition"
+
+  servicelocation:
+    fqn: "ol.location"
+    entitySetName: "GuilfordServiceofProcessLocations"
+    propertyDefinitions:
+      general.id:
+        type: "general.id"
+        column: "svcdistric"
+      ol.district:
+        type: "ol.district"
+        column: "svcdistric"
+    conditions:
+    - !<conditions.BooleanIsNullCondition>
+      column: "svcdistric"
+      reverse: true
+    name: "servicelocation"
+
+  location:
+    fqn: "ol.location"
+    entitySetName: "GuilfordLocations"
+    propertyDefinitions:
+      general.id:
+        type: "general.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["streetnbr", "street", "apt_flr"]
+          separator: "_"
+      location.street:
+        type: "location.street"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["streetnbr", "street"]
+          separator: " "
+      location.apartment:
+        type: "location.apartment"
+        column: "apt_flr"
+    name: "location"
+
+  lawsuit:
+    fqn: "justice.case"
+    entitySetName: "GuilfordLegalProceedings"
+    propertyDefinitions:
+      j.CaseNumberText:
+        type: "j.CaseNumberText"
+        column: "docketnbr"
+      justice.courtcasenumber:
+        type: "justice.courtcasenumber"
+        column: "docketnbr"
+    conditions:
+    - !<conditions.BooleanIsNullCondition>
+      column: "docketnbr"
+      reverse: true
+    name: "lawsuit"
+
+  serviceofprocess:
+    fqn: "ol.serviceofprocess"
+    entitySetName: "GuilfordServiceofProcesses"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "cpmainid"
+      ol.methodofservice:
+        type: "ol.methodofservice"
+        column: "papertype"
+      ol.type:
+        type: "ol.type"
+        column: "cvpaper"
+        transforms:
+        - !<transforms.ReplaceTransform>
+          target: ["ADV", "AFF", "AIW", "ALF", "CAD", "CR", "CS4", "CSC", "CSO", "GAR", "INT", "LET", "MIS", "NCO", "NOF", "NOR", "NOT", "ODV", "OF", "OJC", "ORD", "PAT", "PEX", "PO", "POS", "RES", "RO", "SC", "SC4", "SCC", "SCD", "SCE", "SCJ", "SCO", "SCR", "SD", "SDE", "SFC", "SJ", "SJU", "SM", "SO", "SS", "SSJ", "SSP", "SW", "TW", "WHC", "WPP", "WRP"]
+          goal: ["ADVERTISING CHARGES", "AFFIDAVIT", "ADMINISTRATIVE INSPECTION WARRANT", "ALARM FINE", "CLAIM AND DELIVERY", "CASH RECEIPT", "CIVIL SUMMONS IVD", "CRIMINAL SHOW CAUSE", "CIVIL SUMMONS OUT OF COUNTY", "CIVIL GARNISHMENT", "INTERROGATORIES", "LETTER", "MISCELLANEOUS CHARGE", "NO CONTACT ORDER", "NOTICES OF FORECLOSURE", "NOTICE OF RIGHTS", "NOTICE", "ORDER OF DOMESTIC VIOLENCE", "ORDER OF FORFEITURE", "ORDER JUVENILE CUSTODY", "ORDER", "PROPERTY ATTACHMENT", "PROPERTY EXECUTION", "PROTECTIVE ORDER", "FEES FOR POSTING NOTICES", "ORDER OF RESTITUTION",  "RESTRAINING ORDER", "SUMMONS CIVIL", "SHOW CAUSE ORDER IVD", "ORDER TO SHOW CAUSE CLERKS", "ORDER SHOW CAUSE IVD", "ORDER TO SHOW CAUSE EURESA", "ORDER TO SHOW CAUSE JUVENILE", "ORDER SHOW CAUSE", "SUBPEONA CRIMINAL", "SUBPEONA FOR DOCUMENTS", "SUBPEONA DEPOSITION", "SUMMONS FEDERAL & OUT OF STATE", "SUBPEONA JUVENILE", "SUMMONS JUVENILE", "SUMMONS MAGISTRATE", "SUPPLEMENTAL ORDER", "SHERIFF'S COMMISION FEES", "SUMMONS SUMMERY EJECTMENT", "SUMMONS", "SUBPEONA WITNESS", "TAX WARRANT", "WRIT OF HABEAS CORPUS TEST", "WRIT FOR PERSONAL PROPERTY", "WRIT FOR REAL PROPERTY"]
+      ol.receiveddatetime:
+        type: "ol.receiveddatetime"
+        column: "recedate"
+        transforms:
+        - !<transforms.DateAsDateTimeTransform>
+          pattern: ['yyyy-MM-dd']
+          timezone: "America/New York"
+    name: "serviceofprocess"
+
+
+associationDefinitions:
+  involvedin1:
+    fqn: "ol.involvedin"
+    entitySetName: "GuilfordInvolvedIn"
+    src: "officer"
+    dst: "lawsuit"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["officerid", "docketnbr"]
+          separator: "_"
+      ol.role:
+        type: "ol.role"
+        transforms:
+        - !<transforms.ValueTransform>
+          value: "Officer"
+      ol.datetimestart:
+        type: "ol.datetimestart"
+        column: "recedate"
+        transforms:
+        - !<transforms.DateAsDateTimeTransform>
+          pattern: ['yyyy-MM-dd']
+          timezone: "America/New York"
+      ol.datetimeend:
+        type: "ol.datetimeend"
+        column: "dispdate"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ['yyyy-MM-dd HH:mm:ss','yyyy-MM-dd H:mm:ss.S']
+          timezone: "America/New York"
+    name: "involvedin1"
+
+  involvedin2:
+    fqn: "ol.involvedin"
+    entitySetName: "GuilfordInvolvedIn"
+    src: "person"
+    dst: "lawsuit"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.HashTransform>
+          columns: ["name_desc", "docketnbr"]
+          hashFunction: "sha256"
+      ol.role:
+        type: "ol.role"
+        column: "name_type"
+      ol.datetimestart:
+        type: "ol.datetimestart"
+        column: "recedate"
+        transforms:
+        - !<transforms.DateAsDateTimeTransform>
+          pattern: ['yyyy-MM-dd']
+          timezone: "America/New York"
+      ol.datetimeend:
+        type: "ol.datetimeend"
+        column: "dispdate"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ['yyyy-MM-dd HH:mm:ss','yyyy-MM-dd H:mm:ss.S']
+          timezone: "America/New York"
+    name: "involvedin2"
+
+  filedfor:
+    fqn: "ol.filedfor"
+    entitySetName: "GuilfordFiledFor"
+    src: "serviceofprocess"
+    dst: "lawsuit"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.HashTransform>
+          columns: ["name", "name_desc"]
+          hashFunction: "sha256"
+      justice.dispositiondate:
+        type: "justice.dispositiondate"
+        column: "dispdate"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ['yyyy-MM-dd HH:mm:ss','yyyy-MM-dd H:mm:ss.S']
+          timezone: "America/New York"
+      ol.receiveddatetime:
+        type: "ol.receiveddatetime"
+        column: "recedate"
+        transforms:
+        - !<transforms.DateAsDateTimeTransform>
+          pattern: ['yyyy-MM-dd']
+          timezone: "America/New York"
+    name: "filedfor"
+
+  resultsin1:
+    fqn: "ol.resultsin"
+    entitySetName: "GuilfordResultsIn"
+    src: "serviceofprocess"
+    dst: "disposition"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.HashTransform>
+          columns: ["name", "name_desc"]
+          hashFunction: "sha256"
+      general.datetime:
+        type: "general.datetime"
+        column: "dispdate"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ['yyyy-MM-dd HH:mm:ss','yyyy-MM-dd H:mm:ss.S']
+          timezone: "America/New York"
+    name: "resultsin1"
+
+  involvedin3:
+    fqn: "ol.involvedin"
+    entitySetName: "GuilfordInvolvedIn"
+    src: "person"
+    dst: "serviceofprocess"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.HashTransform>
+          columns: ["name_desc", "cpmainid"]
+          hashFunction: "sha256"
+      ol.role:
+        type: "ol.role"
+        column: "name_type"
+      ol.datetimestart:
+        type: "ol.datetimestart"
+        column: "recedate"
+        transforms:
+        - !<transforms.DateAsDateTimeTransform>
+          pattern: ['yyyy-MM-dd']
+          timezone: "America/New York"
+      ol.datetimeend:
+        type: "ol.datetimeend"
+        column: "dispdate"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ['yyyy-MM-dd HH:mm:ss','yyyy-MM-dd H:mm:ss.S']
+          timezone: "America/New York"
+    name: "involvedin3"
+
+  locatedat1:
+    fqn: "ol.locatedat"
+    entitySetName: "GuilfordLocatedAt"
+    src: "serviceofprocess"
+    dst: "servicelocation"
+    propertyDefinitions:
+      general.id:
+        type: "general.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["cpmainid", "svcdistric"]
+          separator: "_"
+      date.completeddatetime:
+        type: "date.completeddatetime"
+        column: "recedate"
+        transforms:
+        - !<transforms.DateAsDateTimeTransform>
+          pattern: ['yyyy-MM-dd']
+          timezone: "America/New York"
+    name: "locatedat1"
+
+  locatedat2:
+    fqn: "ol.locatedat"
+    entitySetName: "GuilfordLocatedAt"
+    src: "person"
+    dst: "location"
+    propertyDefinitions:
+      general.id:
+        type: "general.id"
+        transforms:
+        - !<transforms.HashTransform>
+          columns: ["name_desc", "streetnbr", "street", "apt_flr"]
+          hashFunction: "sha256"
+      date.completeddatetime:
+        type: "date.completeddatetime"
+        column: "recedate"
+        transforms:
+        - !<transforms.DateAsDateTimeTransform>
+          pattern: ['yyyy-MM-dd']
+          timezone: "America/New York"
+    name: "locatedat2"
+
+  involvedin4:
+    fqn: "ol.involvedin"
+    entitySetName: "GuilfordInvolvedIn"
+    src: "agency"
+    dst: "lawsuit"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["agency", "docketnbr"]
+          separator: "_"
+      ol.datetimestart:
+        type: "ol.datetimestart"
+        column: "recedate"
+        transforms:
+        - !<transforms.DateAsDateTimeTransform>
+          pattern: ['yyyy-MM-dd']
+          timezone: "America/New York"
+      ol.datetimeend:
+        type: "ol.datetimeend"
+        column: "dispdate"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ['yyyy-MM-dd HH:mm:ss','yyyy-MM-dd H:mm:ss.S']
+          timezone: "America/New York"
+    name: "involvedin4"
+
+  worksat:
+    fqn: "ol.worksat"
+    entitySetName: "GuilfordWorksAt"
+    src: "officer"
+    dst: "agency"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["officerid", "agency"]
+          separator: "_"
+    name: "worksat"
+
+  resultsin2:
+    fqn: "ol.resultsin"
+    entitySetName: "GuilfordResultsIn"
+    src: "lawsuit"
+    dst: "disposition"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["docketnbr", "dispcode"]
+          separator: "_"
+      general.datetime:
+        type: "general.datetime"
+        column: "dispdate"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ['yyyy-MM-dd HH:mm:ss','yyyy-MM-dd H:mm:ss.S']
+          timezone: "America/New York"
+    name: "resultsin2"
+
+  involvedin5:
+    fqn: "ol.involvedin"
+    entitySetName: "GuilfordInvolvedIn"
+    src: "business"
+    dst: "serviceofprocess"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.HashTransform>
+          columns: ["name_desc", "cpmainid"]
+          hashFunction: "sha256"
+      ol.role:
+        type: "ol.role"
+        column: "name_type"
+      ol.datetimestart:
+        type: "ol.datetimestart"
+        column: "recedate"
+        transforms:
+        - !<transforms.DateAsDateTimeTransform>
+          pattern: ['yyyy-MM-dd']
+          timezone: "America/New York"
+      ol.datetimeend:
+        type: "ol.datetimeend"
+        column: "dispdate"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ['yyyy-MM-dd HH:mm:ss','yyyy-MM-dd H:mm:ss.S']
+          timezone: "America/New York"
+    name: "involvedin5"
+
+  locatedat3:
+    fqn: "ol.locatedat"
+    entitySetName: "GuilfordLocatedAt"
+    src: "business"
+    dst: "location"
+    propertyDefinitions:
+      general.id:
+        type: "general.id"
+        transforms:
+        - !<transforms.HashTransform>
+          columns: ["name_desc", "streetnbr", "street", "apt_flr"]
+          hashFunction: "sha256"
+      date.completeddatetime:
+        type: "date.completeddatetime"
+        column: "recedate"
+        transforms:
+        - !<transforms.DateAsDateTimeTransform>
+          pattern: ['yyyy-MM-dd']
+          timezone: "America/New York"
+    name: "locatedat3"
+
+  involvedin6:
+    fqn: "ol.involvedin"
+    entitySetName: "GuilfordInvolvedIn"
+    src: "business"
+    dst: "lawsuit"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.HashTransform>
+          columns: ["name_desc", "docketnbr"]
+          hashFunction: "sha256"
+      ol.role:
+        type: "ol.role"
+        column: "name_type"
+      ol.datetimestart:
+        type: "ol.datetimestart"
+        column: "recedate"
+        transforms:
+        - !<transforms.DateAsDateTimeTransform>
+          pattern: ['yyyy-MM-dd']
+          timezone: "America/New York"
+      ol.datetimeend:
+        type: "ol.datetimeend"
+        column: "dispdate"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ['yyyy-MM-dd HH:mm:ss','yyyy-MM-dd H:mm:ss.S']
+          timezone: "America/New York"
+    name: "involvedin6"
