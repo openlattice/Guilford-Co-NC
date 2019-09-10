@@ -299,7 +299,7 @@ entityDefinitions:
         type: "ol.id"
         transforms:
         - !<transforms.ConcatTransform>
-          columns: ["SUPERVISION TERM EXTENSION", "P&P SUPV.TERM CHAIN TYPE CODE", "SUPERVISION TO FOLLOW INCAR.", "LENGTH OF SUPERVISION"]
+          columns: ["OFFENDER NC DOC ID NUMBER", "SENTENCE COMPONENT NUMBER", "SENTENCE EFFECTIVE(BEGIN) DATE"]
       ol.durationdays:
         type: "ol.durationdays"
         column: "LENGTH OF SUPERVISION"
