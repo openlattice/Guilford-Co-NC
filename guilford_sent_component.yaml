@@ -49,11 +49,6 @@ entityDefinitions:
       ol.status:
         type: "ol.status"
         column: "INMATE SENTENCE  STATUS CODE"
-      ol.concurrent:
-        type: "ol.concurrent"
-        column: "TYPE OF COUNT CODE"
-        transforms:
-        - !<transforms.ParseIntTransform> {}
       datetime.received:
         type: "datetime.received"
         column: "SENTENCE CONVICTION DATE"
@@ -595,3 +590,16 @@ associationDefinitions:
         - !<transforms.ConcatTransform>
           columns: ["COUNTY OF CONVICTION CODE", "COURT DOCKET NUMBER"]
     name: "locatedat"
+
+  suspectedof:
+    fqn: "ol.locatedat"
+    entitySetName: "GuilfordSuspectedOf"
+    src: "offender"
+    dst: "offense"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["OFFENDER NC DOC ID NUMBER", "DATE OFFENSE COMMITTED - END", "OFFENSE QUALIFIER CODE", "PRIMARY OFFENSE CODE", "DATE OFFENSE COMMITTED - BEGIN"]
+    name: "suspectedof"
