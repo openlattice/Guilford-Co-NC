@@ -1,0 +1,63 @@
+# select * from sent_computation
+
+entityDefinitions:
+
+  sentenceterm:
+    fqn: "ol.sentenceterm"
+    entitySetName: "GuilfordSentenceTerms_DPS"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["INMATE DOC NUMBER", "SENTENCE BEGIN DATE (FOR MAX)"] #just these two columns in order to overlap with sent_component table
+      ol.datetimestart:
+        type: "ol.datetimestart"
+        column: "SENTENCE BEGIN DATE (FOR MAX)"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.S", "yyyy-MM-dd HH:mm:ss.SS", "yyyy-MM-dd HH:mm:ss.SSS"]
+          timezone: "America/New_York"
+      ol.datetimeend:
+        type: "ol.datetimeend"
+        column: "ACTUAL SENTENCE END DATE"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.S", "yyyy-MM-dd HH:mm:ss.SS", "yyyy-MM-dd HH:mm:ss.SSS"]
+          timezone: "America/New_York"
+      ol.projectedenddatetime:
+        type: "ol.projectedenddatetime"
+        column: "PROJECTED RELEASE DATE (PRD)"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.S", "yyyy-MM-dd HH:mm:ss.SS", "yyyy-MM-dd HH:mm:ss.SSS"]
+          timezone: "America/New_York"
+    name: "sentenceterm"
+
+  supervision:
+    fqn: "ol.supervision"
+    entitySetName: "GuilfordSupervisions"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["INMATE DOC NUMBER", "INMATE SENTENCE COMPONENT", "SENTENCE BEGIN DATE (FOR MAX)"]
+      ol.recognizedstartdate:
+        type: "ol.recognizedstartdate"
+        column: "PAROLE SUPERVISION BEGIN DATE"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.S", "yyyy-MM-dd HH:mm:ss.SS", "yyyy-MM-dd HH:mm:ss.SSS"]
+          timezone: "America/New_York"
+      ol.recognizedenddate:
+        type: "ol.recognizedenddate"
+        column: "PAROLE DISCHARGE DATE"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.S", "yyyy-MM-dd HH:mm:ss.SS", "yyyy-MM-dd HH:mm:ss.SSS"]
+          timezone: "America/New_York"
+    name: "supervision"
+
+associationDefinitions: {}
+
