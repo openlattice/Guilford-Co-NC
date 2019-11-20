@@ -78,6 +78,12 @@ entityDefinitions:
         column: "lat"
         transforms:
         - !<transforms.ParseDoubleTransform> {}
+      ol.locationcoordinates:
+        type: "ol.locationcoordinates"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["lat", "long"]
+          separator: ","
     name: "location"
 
   mapprojection:
