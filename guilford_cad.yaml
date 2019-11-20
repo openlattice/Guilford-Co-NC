@@ -1,9 +1,10 @@
+# select * from call_records;
 
 entityDefinitions:
 
   dispatch:
-    fqn: "ol.dispatch"
-    entitySetName: "GuilfordDispatch"
+    fqn: "ol.callforservice"
+    entitySetName: "GuilfordCallsForService"
     propertyDefinitions:
       ol.id:
         type: "ol.id"
@@ -20,12 +21,14 @@ entityDefinitions:
         transforms:
         - !<transforms.DateTimeTransform>
           pattern: ['yyyy-MM-dd HH:mm:ss','yyyy-MM-dd H:mm:ss.S']
+          timezone: "America/New_York"
       date.completeddatetime:
         type: "date.completeddatetime"
         column: "timeclose"
         transforms:
         - !<transforms.DateTimeTransform>
           pattern: ['yyyy-MM-dd HH:mm:ss','yyyy-MM-dd H:mm:ss.S']
+          timezone: "America/New_York"
       ol.priority:
         type: "ol.priority"
         column: "priority"
@@ -75,6 +78,12 @@ entityDefinitions:
         column: "lat"
         transforms:
         - !<transforms.ParseDoubleTransform> {}
+      ol.locationcoordinates:
+        type: "ol.locationcoordinates"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["lat", "long"]
+          separator: ","
     name: "location"
 
   mapprojection:
@@ -90,9 +99,13 @@ entityDefinitions:
       ol.x:
         type: "ol.x"
         column: "geox"
+        transforms:
+        - !<transforms.ParseDoubleTransform> {}
       ol.y:
         type: "ol.y"
         column: "geoy"
+        transforms:
+        - !<transforms.ParseDoubleTransform> {}
       ol.name:
         type: "ol.name"
         transforms:
@@ -147,7 +160,6 @@ entityDefinitions:
       reverse: false
     name: "fireunit"
 
-  
 
 associationDefinitions:
 
