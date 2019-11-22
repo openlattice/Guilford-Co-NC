@@ -2,191 +2,191 @@
 
 entityDefinitions:
 
-  # offender:
-  #   fqn: "general.person"
-  #   entitySetName: "GuilfordOffenders"
-  #   propertyDefinitions:
-  #     nc.SubjectIdentification:
-  #       type: "nc.SubjectIdentification"
-  #       column: "OFFENDER NC DOC ID NUMBER"
-  #     ol.datasource:
-  #       type: "ol.datasource"
-  #       transforms:
-  #       - !<transforms.ValueTransform>
-  #         value: "NC DPS"
-  #   name: "offender"
+  offender:
+    fqn: "general.person"
+    entitySetName: "GuilfordOffenders"
+    propertyDefinitions:
+      nc.SubjectIdentification:
+        type: "nc.SubjectIdentification"
+        column: "OFFENDER NC DOC ID NUMBER"
+      ol.datasource:
+        type: "ol.datasource"
+        transforms:
+        - !<transforms.ValueTransform>
+          value: "NC DPS"
+    name: "offender"
 
-  # case:
-  #   fqn: "justice.case"
-  #   entitySetName: "GuilfordCourtCases"
-  #   propertyDefinitions:
-  #     j.CaseNumberText:
-  #       type: "j.CaseNumberText"
-  #       column: "COURT DOCKET NUMBER"
-  #     ol.type:
-  #       type: "ol.type"
-  #       column: "COURT TYPE CODE"
-  #   name: "case"
+  case:
+    fqn: "justice.case"
+    entitySetName: "GuilfordCourtCases"
+    propertyDefinitions:
+      j.CaseNumberText:
+        type: "j.CaseNumberText"
+        column: "COURT DOCKET NUMBER"
+      ol.type:
+        type: "ol.type"
+        column: "COURT TYPE CODE"
+    name: "case"
 
-  # sentence:
-  #   fqn: "ol.sentence"
-  #   entitySetName: "GuilfordSentences_DPS"
-  #   propertyDefinitions:
-  #     ol.id:
-  #       type: "ol.id"
-  #       transforms:
-  #       - !<transforms.ConcatTransform>
-  #         columns: ["INMATE SENTENCE  STATUS CODE", "TYPE OF COUNT CODE", "ORIGINAL SENTENCE AUDIT CODE", "SENTENCE TYPE CODE_1", "SENTENCE TYPE CODE", "SENTENCE CONVICTION DATE"]
-  #     ol.type:
-  #       type: "ol.type"
-  #       column: "SENTENCE TYPE CODE"
-  #     ol.convictionresults:
-  #       type: "ol.convictionresults"
-  #       column: "COMPONENT DISPOSITION CODE"
-  #     ol.subtype:
-  #       type: "ol.subtype"
-  #       column: "SENTENCE TYPE CODE_1"
-  #     ol.status:
-  #       type: "ol.status"
-  #       column: "INMATE SENTENCE  STATUS CODE"
-  #     datetime.received:
-  #       type: "datetime.received"
-  #       column: "SENTENCE CONVICTION DATE"
-  #       transforms:
-  #       - !<transforms.DateTimeTransform>
-  #         pattern: ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.S", "yyyy-MM-dd HH:mm:ss.SS", "yyyy-MM-dd HH:mm:ss.SSS"]
-  #         timezone: "America/New_York"
-  #     ol.auditcode:
-  #       type: "ol.auditcode"
-  #       column: "ORIGINAL SENTENCE AUDIT CODE"
-  #     ol.concurrentconsecutive:
-  #       type: "ol.concurrentconsecutive"
-  #       column: "SENTENCE CHAINING TYPE CODE"
-  #   name: "sentence"
+  sentence:
+    fqn: "ol.sentence"
+    entitySetName: "GuilfordSentences_DPS"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["INMATE SENTENCE  STATUS CODE", "TYPE OF COUNT CODE", "ORIGINAL SENTENCE AUDIT CODE", "SENTENCE TYPE CODE_1", "SENTENCE TYPE CODE", "SENTENCE CONVICTION DATE"]
+      ol.type:
+        type: "ol.type"
+        column: "SENTENCE TYPE CODE"
+      ol.convictionresults:
+        type: "ol.convictionresults"
+        column: "COMPONENT DISPOSITION CODE"
+      ol.subtype:
+        type: "ol.subtype"
+        column: "SENTENCE TYPE CODE_1"
+      ol.status:
+        type: "ol.status"
+        column: "INMATE SENTENCE  STATUS CODE"
+      datetime.received:
+        type: "datetime.received"
+        column: "SENTENCE CONVICTION DATE"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.S", "yyyy-MM-dd HH:mm:ss.SS", "yyyy-MM-dd HH:mm:ss.SSS"]
+          timezone: "America/New_York"
+      ol.auditcode:
+        type: "ol.auditcode"
+        column: "ORIGINAL SENTENCE AUDIT CODE"
+      ol.concurrentconsecutive:
+        type: "ol.concurrentconsecutive"
+        column: "SENTENCE CHAINING TYPE CODE"
+    name: "sentence"
 
-  # sentencecomponent:
-  #   fqn: "ol.sentencecomponent"
-  #   entitySetName: "GuilfordSentenceComponents_DPS"
-  #   propertyDefinitions:
-  #     ol.id:
-  #       type: "ol.id"
-  #       transforms:
-  #       - !<transforms.ConcatTransform>
-  #         columns: ["OFFENDER NC DOC ID NUMBER", "SENTENCE COMPONENT NUMBER", "INMATE COMPONENT STATUS DATE"]
-  #     ol.splitsentenceactiveterm:
-  #       type: "ol.splitsentenceactiveterm"
-  #       column: "SPLIT SENTENCE ACTIVE TERM"
-  #     ol.number:
-  #       type: "ol.number"
-  #       column: "SENTENCE COMPONENT NUMBER"
-  #       transforms:
-  #       - !<transforms.ParseIntTransform> {}
-  #     general.datetime:
-  #       type: "general.datetime"
-  #       column: "INMATE COMPONENT STATUS DATE"
-  #       transforms:
-  #       - !<transforms.DateTimeTransform>
-  #         pattern: ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.S", "yyyy-MM-dd HH:mm:ss.SS", "yyyy-MM-dd HH:mm:ss.SSS"]
-  #         timezone: "America/New_York"
-  #   name: "sentencecomponent"
+  sentencecomponent:
+    fqn: "ol.sentencecomponent"
+    entitySetName: "GuilfordSentenceComponents_DPS"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["OFFENDER NC DOC ID NUMBER", "SENTENCE COMPONENT NUMBER", "INMATE COMPONENT STATUS DATE"]
+      ol.splitsentenceactiveterm:
+        type: "ol.splitsentenceactiveterm"
+        column: "SPLIT SENTENCE ACTIVE TERM"
+      ol.number:
+        type: "ol.number"
+        column: "SENTENCE COMPONENT NUMBER"
+        transforms:
+        - !<transforms.ParseIntTransform> {}
+      general.datetime:
+        type: "general.datetime"
+        column: "INMATE COMPONENT STATUS DATE"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.S", "yyyy-MM-dd HH:mm:ss.SS", "yyyy-MM-dd HH:mm:ss.SSS"]
+          timezone: "America/New_York"
+    name: "sentencecomponent"
 
 
-  # charge:
-  #   fqn: "ol.charge"
-  #   entitySetName: "GuilfordCharges"
-  #   propertyDefinitions:
-  #     ol.id:
-  #       type: "ol.id"
-  #       transforms:
-  #       - !<transforms.ConcatTransform>
-  #         columns: ["OFFENSE QUALIFIER CODE", "SENTENCING PENALTY CLASS CODE", "NUMBER OF COUNTS", "PRIMARY OFFENSE CODE", "NC GENERAL STATUTE NUMBER", "PRIMARY FELONY/MISDEMEANOR CD."]
-  #     ol.name:
-  #       type: "ol.name"
-  #       column: "PRIMARY OFFENSE CODE"
-  #     ol.qualifier:
-  #       type: "ol.qualifier"
-  #       column: "OFFENSE QUALIFIER CODE"
-  #     ol.numberofcounts:
-  #       type: "ol.numberofcounts"
-  #       column: "NUMBER OF COUNTS"
-  #       transforms:
-  #       - !<transforms.ParseIntTransform> {}
-  #     ol.level:
-  #       type: "ol.level"
-  #       column: "PRIMARY FELONY/MISDEMEANOR CD."
-  #     ol.statestatute:
-  #       type: "ol.statestatute"
-  #       column: "NC GENERAL STATUTE NUMBER"
-  #     ol.levelstate:
-  #       type: "ol.levelstate"
-  #       column: "SENTENCING PENALTY CLASS CODE"
-  #   name: "charge"
+  charge:
+    fqn: "ol.charge"
+    entitySetName: "GuilfordCharges"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["OFFENSE QUALIFIER CODE", "SENTENCING PENALTY CLASS CODE", "NUMBER OF COUNTS", "PRIMARY OFFENSE CODE", "NC GENERAL STATUTE NUMBER", "PRIMARY FELONY/MISDEMEANOR CD."]
+      ol.name:
+        type: "ol.name"
+        column: "PRIMARY OFFENSE CODE"
+      ol.qualifier:
+        type: "ol.qualifier"
+        column: "OFFENSE QUALIFIER CODE"
+      ol.numberofcounts:
+        type: "ol.numberofcounts"
+        column: "NUMBER OF COUNTS"
+        transforms:
+        - !<transforms.ParseIntTransform> {}
+      ol.level:
+        type: "ol.level"
+        column: "PRIMARY FELONY/MISDEMEANOR CD."
+      ol.statestatute:
+        type: "ol.statestatute"
+        column: "NC GENERAL STATUTE NUMBER"
+      ol.levelstate:
+        type: "ol.levelstate"
+        column: "SENTENCING PENALTY CLASS CODE"
+    name: "charge"
 
-  # chargeevent:
-  #   fqn: "ol.chargeevent"
-  #   entitySetName: "GuilfordChargeEvents"
-  #   propertyDefinitions:
-  #     ol.id:
-  #       type: "ol.id"
-  #       transforms:
-  #       - !<transforms.HashTransform>
-  #         columns: ["OFFENDER NC DOC ID NUMBER", "COMMITMENT PREFIX", "SENTENCE COMPONENT NUMBER", "COUNTY OF CONVICTION CODE", "COURT DOCKET NUMBER", "PUNISHMENT TYPE CODE", "COURT TYPE CODE", "COMPONENT DISPOSITION CODE", "CMP. DISPOSITION CODE (2 OF 2)", "NUMBER OF COUNTS", "TYPE OF COUNT CODE", "PRIMARY OFFENSE CODE", "OFFENSE QUALIFIER CODE", "DATE OFFENSE COMMITTED - BEGIN", "DATE OFFENSE COMMITTED - END", "NC GENERAL STATUTE NUMBER", "PRIMARY FELONY/MISDEMEANOR CD.", "SENTENCING PENALTY CLASS CODE", "PRIOR RCD. POINTS/CONVICTIONS", "PRIOR RECORD LEVEL CODE", "MINIMUM SENTENCE LENGTH", "MAXIMUM SENTENCE LENGTH", "LENGTH OF SUPERVISION", "SUPERVISION TERM EXTENSION", "SUPERVISION TO FOLLOW INCAR.", "SPLIT SENTENCE ACTIVE TERM", "G.S. MAXIMUM SENTENCE ALLOWED", "SERVING MIN OR MAX TERM CODE", "SENTENCE TYPE CODE", "SENTENCE TYPE CODE_1", "SENTENCE TYPE CODE_2", "SENTENCE TYPE CODE_3", "SENTENCE TYPE CODE_4", "SENTENCE TYPE CODE_5", "CREDITS FOR JAIL DAYS SERVED", "ICC JAIL CREDITS (IN DAYS)", "SENTENCE CHAINING TYPE CODE", "PRIOR COMMITMENT PREFIX", "PRIOR COMPONENT IDENTIFIER", "P&P SUPV.TERM CHAIN TYPE CODE", "P&P PRIOR COMMITMENT PREFIX", "PRIOR P&P COMMNT/COMPONENT ID", "TIME COMPUTATION EXCEPTION CD.", "SENTENCE CONVICTION DATE", "SENTENCE EFFECTIVE(BEGIN) DATE", "DELEGATED AUTHORITY FLAG", "INMATE SENTENCE  STATUS CODE", "INMATE COMPONENT STATUS DATE", "P&P CASE STATUS", "P&P COMPONENT STATUS DATE", "DATE OF LAST UPDATE", "TIME OF LAST UPDATE", "ORIGINAL DATA ENTRY DATE", "ORIGINAL SENTENCE AUDIT CODE", "DATE OF LAST UPDATE TWO", "TIME OF LAST UPDATE TWO"]
-  #         hashFunction: "sha256"
-  #     ol.datetimestart:
-  #       type: "ol.datetimestart"
-  #       column: "DATE OFFENSE COMMITTED - BEGIN"
-  #       transforms:
-  #       - !<transforms.DateTimeTransform>
-  #         pattern: ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.S", "yyyy-MM-dd HH:mm:ss.SS", "yyyy-MM-dd HH:mm:ss.SSS"]
-  #         timezone: "America/New_York"
-  #     ol.datetimeend:
-  #       type: "ol.datetimeend"
-  #       column: "DATE OFFENSE COMMITTED - END"
-  #       transforms:
-  #       - !<transforms.DateTimeTransform>
-  #         pattern: ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.S", "yyyy-MM-dd HH:mm:ss.SS", "yyyy-MM-dd HH:mm:ss.SSS"]
-  #         timezone: "America/New_York"
-  #   name: "chargeevent"
+  chargeevent:
+    fqn: "ol.chargeevent"
+    entitySetName: "GuilfordChargeEvents"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.HashTransform>
+          columns: ["OFFENDER NC DOC ID NUMBER", "COMMITMENT PREFIX", "SENTENCE COMPONENT NUMBER", "COUNTY OF CONVICTION CODE", "COURT DOCKET NUMBER", "PUNISHMENT TYPE CODE", "COURT TYPE CODE", "COMPONENT DISPOSITION CODE", "CMP. DISPOSITION CODE (2 OF 2)", "NUMBER OF COUNTS", "TYPE OF COUNT CODE", "PRIMARY OFFENSE CODE", "OFFENSE QUALIFIER CODE", "DATE OFFENSE COMMITTED - BEGIN", "DATE OFFENSE COMMITTED - END", "NC GENERAL STATUTE NUMBER", "PRIMARY FELONY/MISDEMEANOR CD.", "SENTENCING PENALTY CLASS CODE", "PRIOR RCD. POINTS/CONVICTIONS", "PRIOR RECORD LEVEL CODE", "MINIMUM SENTENCE LENGTH", "MAXIMUM SENTENCE LENGTH", "LENGTH OF SUPERVISION", "SUPERVISION TERM EXTENSION", "SUPERVISION TO FOLLOW INCAR.", "SPLIT SENTENCE ACTIVE TERM", "G.S. MAXIMUM SENTENCE ALLOWED", "SERVING MIN OR MAX TERM CODE", "SENTENCE TYPE CODE", "SENTENCE TYPE CODE_1", "SENTENCE TYPE CODE_2", "SENTENCE TYPE CODE_3", "SENTENCE TYPE CODE_4", "SENTENCE TYPE CODE_5", "CREDITS FOR JAIL DAYS SERVED", "ICC JAIL CREDITS (IN DAYS)", "SENTENCE CHAINING TYPE CODE", "PRIOR COMMITMENT PREFIX", "PRIOR COMPONENT IDENTIFIER", "P&P SUPV.TERM CHAIN TYPE CODE", "P&P PRIOR COMMITMENT PREFIX", "PRIOR P&P COMMNT/COMPONENT ID", "TIME COMPUTATION EXCEPTION CD.", "SENTENCE CONVICTION DATE", "SENTENCE EFFECTIVE(BEGIN) DATE", "DELEGATED AUTHORITY FLAG", "INMATE SENTENCE  STATUS CODE", "INMATE COMPONENT STATUS DATE", "P&P CASE STATUS", "P&P COMPONENT STATUS DATE", "DATE OF LAST UPDATE", "TIME OF LAST UPDATE", "ORIGINAL DATA ENTRY DATE", "ORIGINAL SENTENCE AUDIT CODE", "DATE OF LAST UPDATE TWO", "TIME OF LAST UPDATE TWO"]
+          hashFunction: "sha256"
+      ol.datetimestart:
+        type: "ol.datetimestart"
+        column: "DATE OFFENSE COMMITTED - BEGIN"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.S", "yyyy-MM-dd HH:mm:ss.SS", "yyyy-MM-dd HH:mm:ss.SSS"]
+          timezone: "America/New_York"
+      ol.datetimeend:
+        type: "ol.datetimeend"
+        column: "DATE OFFENSE COMMITTED - END"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.S", "yyyy-MM-dd HH:mm:ss.SS", "yyyy-MM-dd HH:mm:ss.SSS"]
+          timezone: "America/New_York"
+    name: "chargeevent"
 
-  # location:
-  #   fqn: "ol.location"
-  #   entitySetName: "GuilfordLocations"
-  #   propertyDefinitions:
-  #     general.id:
-  #       type: "general.id"
-  #       column: "COUNTY OF CONVICTION CODE"
-  #     ol.county:
-  #       type: "ol.county"
-  #       column: "COUNTY OF CONVICTION CODE"
-  #   name: "location"
+  location:
+    fqn: "ol.location"
+    entitySetName: "GuilfordLocations"
+    propertyDefinitions:
+      general.id:
+        type: "general.id"
+        column: "COUNTY OF CONVICTION CODE"
+      ol.county:
+        type: "ol.county"
+        column: "COUNTY OF CONVICTION CODE"
+    name: "location"
 
-  # sentenceterm:
-  #   fqn: "ol.sentenceterm"
-  #   entitySetName: "GuilfordSentenceTerms_DPS"
-  #   propertyDefinitions:
-  #     ol.id:
-  #       type: "ol.id"
-  #       transforms:
-  #       - !<transforms.ConcatTransform>
-  #         columns: ["OFFENDER NC DOC ID NUMBER", "SENTENCE EFFECTIVE(BEGIN) DATE"] #just these two columns in order to overlap with sent_computation table
-  #     ol.minimumvalue:
-  #       type: "ol.minimumvalue"
-  #       column: "MINIMUM SENTENCE LENGTH"
-  #       transforms:
-  #       - !<transforms.ParseDoubleTransform> {}
-  #     ol.maximumvalue:
-  #       type: "ol.maximumvalue"
-  #       column: "MAXIMUM SENTENCE LENGTH"
-  #       transforms:
-  #       - !<transforms.ParseDoubleTransform> {}
-  #     ol.datetimestart:
-  #       type: "ol.datetimestart"
-  #       column: "SENTENCE EFFECTIVE(BEGIN) DATE"
-  #       transforms:
-  #       - !<transforms.DateTimeTransform>
-  #         pattern: ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.S", "yyyy-MM-dd HH:mm:ss.SS", "yyyy-MM-dd HH:mm:ss.SSS"]
-  #         timezone: "America/New_York"
-  #   name: "sentenceterm"
+  sentenceterm:
+    fqn: "ol.sentenceterm"
+    entitySetName: "GuilfordSentenceTerms_DPS"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["OFFENDER NC DOC ID NUMBER", "SENTENCE EFFECTIVE(BEGIN) DATE"] #just these two columns in order to overlap with sent_computation table
+      ol.minimumvalue:
+        type: "ol.minimumvalue"
+        column: "MINIMUM SENTENCE LENGTH"
+        transforms:
+        - !<transforms.ParseDoubleTransform> {}
+      ol.maximumvalue:
+        type: "ol.maximumvalue"
+        column: "MAXIMUM SENTENCE LENGTH"
+        transforms:
+        - !<transforms.ParseDoubleTransform> {}
+      ol.datetimestart:
+        type: "ol.datetimestart"
+        column: "SENTENCE EFFECTIVE(BEGIN) DATE"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.S", "yyyy-MM-dd HH:mm:ss.SS", "yyyy-MM-dd HH:mm:ss.SSS"]
+          timezone: "America/New_York"
+    name: "sentenceterm"
 
   jailtimemodifications:
     fqn: "ol.jailtimemodifications"
@@ -236,17 +236,17 @@ entityDefinitions:
           value: "ICC JAIL CREDITS (IN DAYS)"
     name: "icccreditdays"
 
-  # disposition:
-  #   fqn: "ol.disposition"
-  #   entitySetName: "GuilfordDispositions"
-  #   propertyDefinitions:
-  #     ol.id:
-  #       type: "ol.id"
-  #       column: "COMPONENT DISPOSITION CODE"
-  #     criminaljustice.disposition:
-  #       type: "criminaljustice.disposition"
-  #       column: "COMPONENT DISPOSITION CODE"
-  #   name: "disposition"
+  disposition:
+    fqn: "ol.disposition"
+    entitySetName: "GuilfordDispositions"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "COMPONENT DISPOSITION CODE"
+      criminaljustice.disposition:
+        type: "criminaljustice.disposition"
+        column: "COMPONENT DISPOSITION CODE"
+    name: "disposition"
 
   jailstay:
     fqn: "ol.jailstay"
@@ -262,126 +262,126 @@ entityDefinitions:
         column: "SERVING MIN OR MAX TERM CODE"
     name: "jailstay"
 
-  # offense:
-  #   fqn: "ol.offense"
-  #   entitySetName: "GuilfordOffenses"
-  #   propertyDefinitions:
-  #     ol.id:
-  #       type: "ol.id"
-  #       transforms:
-  #       - !<transforms.ConcatTransform>
-  #         columns: ["DATE OFFENSE COMMITTED - END", "OFFENSE QUALIFIER CODE", "PRIMARY OFFENSE CODE", "DATE OFFENSE COMMITTED - BEGIN"]
-  #     ol.description:
-  #       type: "ol.description"
-  #       column: "PRIMARY OFFENSE CODE"
-  #     ol.qualifier:
-  #       type: "ol.qualifier"
-  #       column: "OFFENSE QUALIFIER CODE"
-  #     ol.datetimestart:
-  #       type: "ol.datetimestart"
-  #       column: "DATE OFFENSE COMMITTED - BEGIN"
-  #       transforms:
-  #       - !<transforms.DateTimeTransform>
-  #         pattern: ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.S", "yyyy-MM-dd HH:mm:ss.SS", "yyyy-MM-dd HH:mm:ss.SSS"]
-  #         timezone: "America/New_York"
-  #     ol.datetimeend:
-  #       type: "ol.datetimeend"
-  #       column: "DATE OFFENSE COMMITTED - END"
-  #       transforms:
-  #       - !<transforms.DateTimeTransform>
-  #         pattern: ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.S", "yyyy-MM-dd HH:mm:ss.SS", "yyyy-MM-dd HH:mm:ss.SSS"]
-  #         timezone: "America/New_York"
-  #   name: "offense"
+  offense:
+    fqn: "ol.offense"
+    entitySetName: "GuilfordOffenses"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["DATE OFFENSE COMMITTED - END", "OFFENSE QUALIFIER CODE", "PRIMARY OFFENSE CODE", "DATE OFFENSE COMMITTED - BEGIN"]
+      ol.description:
+        type: "ol.description"
+        column: "PRIMARY OFFENSE CODE"
+      ol.qualifier:
+        type: "ol.qualifier"
+        column: "OFFENSE QUALIFIER CODE"
+      ol.datetimestart:
+        type: "ol.datetimestart"
+        column: "DATE OFFENSE COMMITTED - BEGIN"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.S", "yyyy-MM-dd HH:mm:ss.SS", "yyyy-MM-dd HH:mm:ss.SSS"]
+          timezone: "America/New_York"
+      ol.datetimeend:
+        type: "ol.datetimeend"
+        column: "DATE OFFENSE COMMITTED - END"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.S", "yyyy-MM-dd HH:mm:ss.SS", "yyyy-MM-dd HH:mm:ss.SSS"]
+          timezone: "America/New_York"
+    name: "offense"
 
-  # supervision:
-  #   fqn: "ol.supervision"
-  #   entitySetName: "GuilfordSupervisions"
-  #   propertyDefinitions:
-  #     ol.id:
-  #       type: "ol.id"
-  #       transforms:
-  #       - !<transforms.ConcatTransform>
-  #         columns: ["OFFENDER NC DOC ID NUMBER", "SENTENCE COMPONENT NUMBER", "SENTENCE EFFECTIVE(BEGIN) DATE"]
-  #     ol.durationdays:
-  #       type: "ol.durationdays"
-  #       column: "LENGTH OF SUPERVISION"
-  #       transforms:
-  #       - !<transforms.ParseDoubleTransform> {}
-  #     ol.concurrentconsecutive:
-  #       type: "ol.concurrentconsecutive"
-  #       column: "P&P SUPV.TERM CHAIN TYPE CODE"
-  #       transforms:
-  #       - !<transforms.CaseTransform>
-  #         type: lower
-  #     ol.extension:
-  #       type: "ol.extension"
-  #       column: "SUPERVISION TERM EXTENSION"
-  #     ol.notes:
-  #       type: "ol.notes"
-  #       column: "SUPERVISION TO FOLLOW INCAR."
-  #     ol.status:
-  #       type: "ol.status"
-  #       column: 'P&P CASE STATUS'
-  #   name: "supervision"
+  supervision:
+    fqn: "ol.supervision"
+    entitySetName: "GuilfordSupervisions"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["OFFENDER NC DOC ID NUMBER", "SENTENCE COMPONENT NUMBER", "SENTENCE EFFECTIVE(BEGIN) DATE"]
+      ol.durationdays:
+        type: "ol.durationdays"
+        column: "LENGTH OF SUPERVISION"
+        transforms:
+        - !<transforms.ParseDoubleTransform> {}
+      ol.concurrentconsecutive:
+        type: "ol.concurrentconsecutive"
+        column: "P&P SUPV.TERM CHAIN TYPE CODE"
+        transforms:
+        - !<transforms.CaseTransform>
+          type: lower
+      ol.extension:
+        type: "ol.extension"
+        column: "SUPERVISION TERM EXTENSION"
+      ol.notes:
+        type: "ol.notes"
+        column: "SUPERVISION TO FOLLOW INCAR."
+      ol.status:
+        type: "ol.status"
+        column: 'P&P CASE STATUS'
+    name: "supervision"
 
-  # supervisioncomponent:
-  #   fqn: "ol.supervisioncomponent"
-  #   entitySetName: "GuilfordSupervisionComponents"
-  #   propertyDefinitions:
-  #     ol.id:
-  #       type: "ol.id"
-  #       transforms:
-  #       - !<transforms.ConcatTransform>
-  #         columns: ["P&P COMPONENT STATUS DATE", "P&P PRIOR COMMITMENT PREFIX"]
-  #     ol.status:
-  #       type: "ol.status"
-  #       column: 'P&P COMPONENT STATUS DATE'
-  #     ol.commitment:
-  #       type: "ol.commitment"
-  #       column: 'P&P PRIOR COMMITMENT PREFIX'
-  #   name: "supervisioncomponent"
+  supervisioncomponent:
+    fqn: "ol.supervisioncomponent"
+    entitySetName: "GuilfordSupervisionComponents"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["P&P COMPONENT STATUS DATE", "P&P PRIOR COMMITMENT PREFIX"]
+      ol.status:
+        type: "ol.status"
+        column: 'P&P COMPONENT STATUS DATE'
+      ol.commitment:
+        type: "ol.commitment"
+        column: 'P&P PRIOR COMMITMENT PREFIX'
+    name: "supervisioncomponent"
 
 
 associationDefinitions:
 
-  # sentencedwith1:
-  #   fqn: "ol.sentencedwith"
-  #   entitySetName: "GuilfordSentencedWith"
-  #   src: "offender"
-  #   dst: "sentence"
-  #   propertyDefinitions:
-  #     ol.id:
-  #       type: "ol.id"
-  #       transforms:
-  #       - !<transforms.ConcatTransform>
-  #         columns: ["INMATE SENTENCE  STATUS CODE", "SPLIT SENTENCE ACTIVE TERM", "OFFENDER NC DOC ID NUMBER", "TYPE OF COUNT CODE", "ORIGINAL SENTENCE AUDIT CODE", "SENTENCE TYPE CODE_1", "SENTENCE TYPE CODE", "COMPONENT DISPOSITION CODE", "SENTENCE CONVICTION DATE"]
-  #   name: "sentencedwith1"
+  sentencedwith1:
+    fqn: "ol.sentencedwith"
+    entitySetName: "GuilfordSentencedWith"
+    src: "offender"
+    dst: "sentence"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["INMATE SENTENCE  STATUS CODE", "SPLIT SENTENCE ACTIVE TERM", "OFFENDER NC DOC ID NUMBER", "TYPE OF COUNT CODE", "ORIGINAL SENTENCE AUDIT CODE", "SENTENCE TYPE CODE_1", "SENTENCE TYPE CODE", "COMPONENT DISPOSITION CODE", "SENTENCE CONVICTION DATE"]
+    name: "sentencedwith1"
 
-  # sentencedwith2:
-  #   fqn: "ol.sentencedwith"
-  #   entitySetName: "GuilfordSentencedWith"
-  #   src: "offender"
-  #   dst: "sentenceterm"
-  #   propertyDefinitions:
-  #     ol.id:
-  #       type: "ol.id"
-  #       transforms:
-  #       - !<transforms.ConcatTransform>
-  #         columns: ["OFFENDER NC DOC ID NUMBER", "SENTENCE EFFECTIVE(BEGIN) DATE", "MAXIMUM SENTENCE LENGTH", "MINIMUM SENTENCE LENGTH", "ICC JAIL CREDITS (IN DAYS)", "CREDITS FOR JAIL DAYS SERVED"]
-  #   name: "sentencedwith2"
+  sentencedwith2:
+    fqn: "ol.sentencedwith"
+    entitySetName: "GuilfordSentencedWith"
+    src: "offender"
+    dst: "sentenceterm"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["OFFENDER NC DOC ID NUMBER", "SENTENCE EFFECTIVE(BEGIN) DATE", "MAXIMUM SENTENCE LENGTH", "MINIMUM SENTENCE LENGTH", "ICC JAIL CREDITS (IN DAYS)", "CREDITS FOR JAIL DAYS SERVED"]
+    name: "sentencedwith2"
 
-  # registeredfor1:
-  #   fqn: "general.registeredfor"
-  #   entitySetName: "GuilfordRegisteredFor"
-  #   src: "chargeevent"
-  #   dst: "charge"
-  #   generator:  !<generators.TransformSeriesGenerator>
-  #     transforms:
-  #     - !<transforms.HashTransform>
-  #       columns: ["SUPERVISION TERM EXTENSION", "P&P PRIOR COMMITMENT PREFIX", "TYPE OF COUNT CODE", "TIME COMPUTATION EXCEPTION CD.", "INMATE SENTENCE  STATUS CODE", "PRIOR COMPONENT IDENTIFIER", "COURT DOCKET NUMBER", "ICC JAIL CREDITS (IN DAYS)", "DATE OFFENSE COMMITTED - BEGIN", "SENTENCE EFFECTIVE(BEGIN) DATE", "SENTENCE TYPE CODE_4", "COUNTY OF CONVICTION CODE", "SENTENCE CONVICTION DATE", "COMMITMENT PREFIX", "SENTENCE TYPE CODE_3", "SPLIT SENTENCE ACTIVE TERM", "CMP. DISPOSITION CODE (2 OF 2)", "PRIOR COMMITMENT PREFIX", "PRIOR P&P COMMNT/COMPONENT ID", "TIME OF LAST UPDATE TWO", "P&P CASE STATUS", "COMPONENT DISPOSITION CODE", "NC GENERAL STATUTE NUMBER", "SENTENCE TYPE CODE_5", "SENTENCE CHAINING TYPE CODE", "PRIOR RECORD LEVEL CODE", "MINIMUM SENTENCE LENGTH", "SERVING MIN OR MAX TERM CODE", "PRIMARY OFFENSE CODE", "P&P SUPV.TERM CHAIN TYPE CODE", "CREDITS FOR JAIL DAYS SERVED", "DATE OF LAST UPDATE TWO", "PRIOR RCD. POINTS/CONVICTIONS", "G.S. MAXIMUM SENTENCE ALLOWED", "SENTENCE TYPE CODE", "P&P COMPONENT STATUS DATE", "OFFENSE QUALIFIER CODE", "LENGTH OF SUPERVISION", "MAXIMUM SENTENCE LENGTH", "SUPERVISION TO FOLLOW INCAR.", "TIME OF LAST UPDATE", "DELEGATED AUTHORITY FLAG", "PRIMARY FELONY/MISDEMEANOR CD.", "SENTENCE TYPE CODE_2", "SENTENCE COMPONENT NUMBER", "DATE OFFENSE COMMITTED - END", "ORIGINAL DATA ENTRY DATE", "COURT TYPE CODE", "OFFENDER NC DOC ID NUMBER", "ORIGINAL SENTENCE AUDIT CODE", "DATE OF LAST UPDATE", "SENTENCING PENALTY CLASS CODE", "NUMBER OF COUNTS", "PUNISHMENT TYPE CODE", "SENTENCE TYPE CODE_1", "INMATE COMPONENT STATUS DATE"]
-  #       hashFunction: "sha256"
-  #   propertyDefinitions: {}
-  #   name: "registeredfor1"
+  registeredfor1:
+    fqn: "general.registeredfor"
+    entitySetName: "GuilfordRegisteredFor"
+    src: "chargeevent"
+    dst: "charge"
+    generator:  !<generators.TransformSeriesGenerator>
+      transforms:
+      - !<transforms.HashTransform>
+        columns: ["SUPERVISION TERM EXTENSION", "P&P PRIOR COMMITMENT PREFIX", "TYPE OF COUNT CODE", "TIME COMPUTATION EXCEPTION CD.", "INMATE SENTENCE  STATUS CODE", "PRIOR COMPONENT IDENTIFIER", "COURT DOCKET NUMBER", "ICC JAIL CREDITS (IN DAYS)", "DATE OFFENSE COMMITTED - BEGIN", "SENTENCE EFFECTIVE(BEGIN) DATE", "SENTENCE TYPE CODE_4", "COUNTY OF CONVICTION CODE", "SENTENCE CONVICTION DATE", "COMMITMENT PREFIX", "SENTENCE TYPE CODE_3", "SPLIT SENTENCE ACTIVE TERM", "CMP. DISPOSITION CODE (2 OF 2)", "PRIOR COMMITMENT PREFIX", "PRIOR P&P COMMNT/COMPONENT ID", "TIME OF LAST UPDATE TWO", "P&P CASE STATUS", "COMPONENT DISPOSITION CODE", "NC GENERAL STATUTE NUMBER", "SENTENCE TYPE CODE_5", "SENTENCE CHAINING TYPE CODE", "PRIOR RECORD LEVEL CODE", "MINIMUM SENTENCE LENGTH", "SERVING MIN OR MAX TERM CODE", "PRIMARY OFFENSE CODE", "P&P SUPV.TERM CHAIN TYPE CODE", "CREDITS FOR JAIL DAYS SERVED", "DATE OF LAST UPDATE TWO", "PRIOR RCD. POINTS/CONVICTIONS", "G.S. MAXIMUM SENTENCE ALLOWED", "SENTENCE TYPE CODE", "P&P COMPONENT STATUS DATE", "OFFENSE QUALIFIER CODE", "LENGTH OF SUPERVISION", "MAXIMUM SENTENCE LENGTH", "SUPERVISION TO FOLLOW INCAR.", "TIME OF LAST UPDATE", "DELEGATED AUTHORITY FLAG", "PRIMARY FELONY/MISDEMEANOR CD.", "SENTENCE TYPE CODE_2", "SENTENCE COMPONENT NUMBER", "DATE OFFENSE COMMITTED - END", "ORIGINAL DATA ENTRY DATE", "COURT TYPE CODE", "OFFENDER NC DOC ID NUMBER", "ORIGINAL SENTENCE AUDIT CODE", "DATE OF LAST UPDATE", "SENTENCING PENALTY CLASS CODE", "NUMBER OF COUNTS", "PUNISHMENT TYPE CODE", "SENTENCE TYPE CODE_1", "INMATE COMPONENT STATUS DATE"]
+        hashFunction: "sha256"
+    propertyDefinitions: {}
+    name: "registeredfor1"
 
   registeredfor2:
     fqn: "general.registeredfor"
@@ -409,227 +409,227 @@ associationDefinitions:
     propertyDefinitions: {}
     name: "registeredfor3"
 
-  # appearsin:
-  #   fqn: "ol.appearsin"
-  #   entitySetName: "GuilfordAppearsIn"
-  #   src: "offender"
-  #   dst: "case"
-  #   propertyDefinitions:
-  #     ol.id:
-  #       type: "ol.id"
-  #       transforms:
-  #       - !<transforms.ConcatTransform>
-  #         columns: ["OFFENDER NC DOC ID NUMBER", "COURT DOCKET NUMBER"]
-  #   name: "appearsin"
+  appearsin:
+    fqn: "ol.appearsin"
+    entitySetName: "GuilfordAppearsIn"
+    src: "offender"
+    dst: "case"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["OFFENDER NC DOC ID NUMBER", "COURT DOCKET NUMBER"]
+    name: "appearsin"
 
-  # oflength:
-  #   fqn: "ol.oflength"
-  #   entitySetName: "GuilfordOfLength"
-  #   src: "sentence"
-  #   dst: "sentenceterm"
-  #   propertyDefinitions:
-  #     ol.id:
-  #       type: "ol.id"
-  #       transforms:
-  #       - !<transforms.ConcatTransform>
-  #         columns: ["INMATE SENTENCE  STATUS CODE", "SPLIT SENTENCE ACTIVE TERM", "TYPE OF COUNT CODE", "ICC JAIL CREDITS (IN DAYS)", "ORIGINAL SENTENCE AUDIT CODE", "SENTENCE TYPE CODE_1", "SENTENCE TYPE CODE", "COMPONENT DISPOSITION CODE", "SENTENCE CONVICTION DATE", "SENTENCE EFFECTIVE(BEGIN) DATE", "MAXIMUM SENTENCE LENGTH", "MINIMUM SENTENCE LENGTH", "CREDITS FOR JAIL DAYS SERVED"]
-  #   name: "oflength"
+  oflength:
+    fqn: "ol.oflength"
+    entitySetName: "GuilfordOfLength"
+    src: "sentence"
+    dst: "sentenceterm"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["INMATE SENTENCE  STATUS CODE", "SPLIT SENTENCE ACTIVE TERM", "TYPE OF COUNT CODE", "ICC JAIL CREDITS (IN DAYS)", "ORIGINAL SENTENCE AUDIT CODE", "SENTENCE TYPE CODE_1", "SENTENCE TYPE CODE", "COMPONENT DISPOSITION CODE", "SENTENCE CONVICTION DATE", "SENTENCE EFFECTIVE(BEGIN) DATE", "MAXIMUM SENTENCE LENGTH", "MINIMUM SENTENCE LENGTH", "CREDITS FOR JAIL DAYS SERVED"]
+    name: "oflength"
 
-  # subjectof:
-  #   fqn: "ol.subjectof"
-  #   entitySetName: "GuilfordSubjectOf"
-  #   src: "offender"
-  #   dst: "jailstay"
-  #   propertyDefinitions:
-  #     ol.id:
-  #       type: "ol.id"
-  #       transforms:
-  #       - !<transforms.ConcatTransform>
-  #         columns: ["SERVING MIN OR MAX TERM CODE", "OFFENDER NC DOC ID NUMBER"]
-  #   name: "subjectof"
+  subjectof:
+    fqn: "ol.subjectof"
+    entitySetName: "GuilfordSubjectOf"
+    src: "offender"
+    dst: "jailstay"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["SERVING MIN OR MAX TERM CODE", "OFFENDER NC DOC ID NUMBER"]
+    name: "subjectof"
 
-  # chargedwith1:
-  #   fqn: "ol.chargedwith"
-  #   entitySetName: "GuilfordChargedWith"
-  #   src: "offender"
-  #   dst: "chargeevent"
-  #   propertyDefinitions:
-  #     ol.id:
-  #       type: "ol.id"
-  #       transforms:
-  #       - !<transforms.HashTransform>
-  #         columns: ["SUPERVISION TERM EXTENSION", "P&P PRIOR COMMITMENT PREFIX", "TYPE OF COUNT CODE", "TIME COMPUTATION EXCEPTION CD.", "INMATE SENTENCE  STATUS CODE", "PRIOR COMPONENT IDENTIFIER", "ICC JAIL CREDITS (IN DAYS)", "DATE OFFENSE COMMITTED - BEGIN", "SENTENCE EFFECTIVE(BEGIN) DATE", "SENTENCE TYPE CODE_4", "COUNTY OF CONVICTION CODE", "SENTENCE CONVICTION DATE", "COMMITMENT PREFIX", "SENTENCE TYPE CODE_3", "SPLIT SENTENCE ACTIVE TERM", "CMP. DISPOSITION CODE (2 OF 2)", "PRIOR COMMITMENT PREFIX", "PRIOR P&P COMMNT/COMPONENT ID", "TIME OF LAST UPDATE TWO", "P&P CASE STATUS", "COMPONENT DISPOSITION CODE", "NC GENERAL STATUTE NUMBER", "SENTENCE TYPE CODE_5", "SENTENCE CHAINING TYPE CODE", "PRIOR RECORD LEVEL CODE", "MINIMUM SENTENCE LENGTH", "SERVING MIN OR MAX TERM CODE", "PRIMARY OFFENSE CODE", "P&P SUPV.TERM CHAIN TYPE CODE", "CREDITS FOR JAIL DAYS SERVED", "DATE OF LAST UPDATE TWO", "PRIOR RCD. POINTS/CONVICTIONS", "G.S. MAXIMUM SENTENCE ALLOWED", "SENTENCE TYPE CODE", "P&P COMPONENT STATUS DATE", "OFFENSE QUALIFIER CODE", "LENGTH OF SUPERVISION", "MAXIMUM SENTENCE LENGTH", "SUPERVISION TO FOLLOW INCAR.", "TIME OF LAST UPDATE", "DELEGATED AUTHORITY FLAG", "PRIMARY FELONY/MISDEMEANOR CD.", "SENTENCE TYPE CODE_2", "SENTENCE COMPONENT NUMBER", "DATE OFFENSE COMMITTED - END", "PUNISHMENT TYPE CODE", "ORIGINAL DATA ENTRY DATE", "COURT TYPE CODE", "OFFENDER NC DOC ID NUMBER", "ORIGINAL SENTENCE AUDIT CODE", "DATE OF LAST UPDATE", "SENTENCING PENALTY CLASS CODE", "NUMBER OF COUNTS", "COURT DOCKET NUMBER", "SENTENCE TYPE CODE_1", "INMATE COMPONENT STATUS DATE"]
-  #         hashFunction: "sha256"
-  #     general.datetime:
-  #       type: "general.datetime"
-  #       column: "DATE OFFENSE COMMITTED - END"
-  #       transforms:
-  #       - !<transforms.DateTimeTransform>
-  #         pattern: ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.S", "yyyy-MM-dd HH:mm:ss.SS", "yyyy-MM-dd HH:mm:ss.SSS"]
-  #         timezone: "America/New_York"
-  #   name: "chargedwith1"
+  chargedwith1:
+    fqn: "ol.chargedwith"
+    entitySetName: "GuilfordChargedWith"
+    src: "offender"
+    dst: "chargeevent"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.HashTransform>
+          columns: ["SUPERVISION TERM EXTENSION", "P&P PRIOR COMMITMENT PREFIX", "TYPE OF COUNT CODE", "TIME COMPUTATION EXCEPTION CD.", "INMATE SENTENCE  STATUS CODE", "PRIOR COMPONENT IDENTIFIER", "ICC JAIL CREDITS (IN DAYS)", "DATE OFFENSE COMMITTED - BEGIN", "SENTENCE EFFECTIVE(BEGIN) DATE", "SENTENCE TYPE CODE_4", "COUNTY OF CONVICTION CODE", "SENTENCE CONVICTION DATE", "COMMITMENT PREFIX", "SENTENCE TYPE CODE_3", "SPLIT SENTENCE ACTIVE TERM", "CMP. DISPOSITION CODE (2 OF 2)", "PRIOR COMMITMENT PREFIX", "PRIOR P&P COMMNT/COMPONENT ID", "TIME OF LAST UPDATE TWO", "P&P CASE STATUS", "COMPONENT DISPOSITION CODE", "NC GENERAL STATUTE NUMBER", "SENTENCE TYPE CODE_5", "SENTENCE CHAINING TYPE CODE", "PRIOR RECORD LEVEL CODE", "MINIMUM SENTENCE LENGTH", "SERVING MIN OR MAX TERM CODE", "PRIMARY OFFENSE CODE", "P&P SUPV.TERM CHAIN TYPE CODE", "CREDITS FOR JAIL DAYS SERVED", "DATE OF LAST UPDATE TWO", "PRIOR RCD. POINTS/CONVICTIONS", "G.S. MAXIMUM SENTENCE ALLOWED", "SENTENCE TYPE CODE", "P&P COMPONENT STATUS DATE", "OFFENSE QUALIFIER CODE", "LENGTH OF SUPERVISION", "MAXIMUM SENTENCE LENGTH", "SUPERVISION TO FOLLOW INCAR.", "TIME OF LAST UPDATE", "DELEGATED AUTHORITY FLAG", "PRIMARY FELONY/MISDEMEANOR CD.", "SENTENCE TYPE CODE_2", "SENTENCE COMPONENT NUMBER", "DATE OFFENSE COMMITTED - END", "PUNISHMENT TYPE CODE", "ORIGINAL DATA ENTRY DATE", "COURT TYPE CODE", "OFFENDER NC DOC ID NUMBER", "ORIGINAL SENTENCE AUDIT CODE", "DATE OF LAST UPDATE", "SENTENCING PENALTY CLASS CODE", "NUMBER OF COUNTS", "COURT DOCKET NUMBER", "SENTENCE TYPE CODE_1", "INMATE COMPONENT STATUS DATE"]
+          hashFunction: "sha256"
+      general.datetime:
+        type: "general.datetime"
+        column: "DATE OFFENSE COMMITTED - END"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.S", "yyyy-MM-dd HH:mm:ss.SS", "yyyy-MM-dd HH:mm:ss.SSS"]
+          timezone: "America/New_York"
+    name: "chargedwith1"
 
-  # chargedwith2:
-  #   fqn: "ol.chargedwith"
-  #   entitySetName: "GuilfordChargedWith"
-  #   src: "offender"
-  #   dst: "charge"
-  #   propertyDefinitions:
-  #     ol.id:
-  #       type: "ol.id"
-  #       transforms:
-  #       - !<transforms.ConcatTransform>
-  #         columns: [OFFENDER NC DOC ID NUMBER, "OFFENSE QUALIFIER CODE", "SENTENCING PENALTY CLASS CODE", "NUMBER OF COUNTS", "PRIMARY OFFENSE CODE", "NC GENERAL STATUTE NUMBER", "PRIMARY FELONY/MISDEMEANOR CD."]
-  #     general.datetime:
-  #       type: "general.datetime"
-  #       column: "DATE OFFENSE COMMITTED - END"
-  #       transforms:
-  #       - !<transforms.DateTimeTransform>
-  #         pattern: ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.S", "yyyy-MM-dd HH:mm:ss.SS", "yyyy-MM-dd HH:mm:ss.SSS"]
-  #         timezone: "America/New_York"
-  #   name: "chargedwith2"
+  chargedwith2:
+    fqn: "ol.chargedwith"
+    entitySetName: "GuilfordChargedWith"
+    src: "offender"
+    dst: "charge"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: [OFFENDER NC DOC ID NUMBER, "OFFENSE QUALIFIER CODE", "SENTENCING PENALTY CLASS CODE", "NUMBER OF COUNTS", "PRIMARY OFFENSE CODE", "NC GENERAL STATUTE NUMBER", "PRIMARY FELONY/MISDEMEANOR CD."]
+      general.datetime:
+        type: "general.datetime"
+        column: "DATE OFFENSE COMMITTED - END"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.S", "yyyy-MM-dd HH:mm:ss.SS", "yyyy-MM-dd HH:mm:ss.SSS"]
+          timezone: "America/New_York"
+    name: "chargedwith2"
 
-  # clearedby:
-  #   fqn: "ol.clearedby"
-  #   entitySetName: "GuilfordClearedBy"
-  #   src: "case"
-  #   dst: "disposition"
-  #   propertyDefinitions:
-  #     ol.id:
-  #       type: "ol.id"
-  #       transforms:
-  #       - !<transforms.ConcatTransform>
-  #         columns: ["COMPONENT DISPOSITION CODE", "COURT DOCKET NUMBER"]
-  #   name: "clearedby"
+  clearedby:
+    fqn: "ol.clearedby"
+    entitySetName: "GuilfordClearedBy"
+    src: "case"
+    dst: "disposition"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["COMPONENT DISPOSITION CODE", "COURT DOCKET NUMBER"]
+    name: "clearedby"
 
-  # resultsin1:
-  #   fqn: "ol.resultsin"
-  #   entitySetName: "GuilfordResultsIn"
-  #   src: "chargeevent"
-  #   dst: "sentence"
-  #   propertyDefinitions:
-  #     ol.id:
-  #       type: "ol.id"
-  #       transforms:
-  #       - !<transforms.ConcatCombineTransform>
-  #         transforms:
-  #         - !<transforms.HashTransform>
-  #           columns: ["SUPERVISION TERM EXTENSION", "P&P PRIOR COMMITMENT PREFIX", "TYPE OF COUNT CODE", "TIME COMPUTATION EXCEPTION CD.", "INMATE SENTENCE  STATUS CODE", "PRIOR COMPONENT IDENTIFIER", "COURT DOCKET NUMBER", "ICC JAIL CREDITS (IN DAYS)", "DATE OFFENSE COMMITTED - BEGIN", "SENTENCE EFFECTIVE(BEGIN) DATE", "SENTENCE TYPE CODE_4", "COUNTY OF CONVICTION CODE", "SENTENCE CONVICTION DATE", "COMMITMENT PREFIX", "SENTENCE TYPE CODE_3", "SPLIT SENTENCE ACTIVE TERM", "CMP. DISPOSITION CODE (2 OF 2)", "PRIOR COMMITMENT PREFIX", "PRIOR P&P COMMNT/COMPONENT ID", "TIME OF LAST UPDATE TWO", "P&P CASE STATUS", "COMPONENT DISPOSITION CODE", "NC GENERAL STATUTE NUMBER", "SENTENCE TYPE CODE_5", "SENTENCE CHAINING TYPE CODE", "PRIOR RECORD LEVEL CODE", "MINIMUM SENTENCE LENGTH", "SERVING MIN OR MAX TERM CODE", "PRIMARY OFFENSE CODE", "P&P SUPV.TERM CHAIN TYPE CODE", "CREDITS FOR JAIL DAYS SERVED", "DATE OF LAST UPDATE TWO", "PRIOR RCD. POINTS/CONVICTIONS", "G.S. MAXIMUM SENTENCE ALLOWED", "SENTENCE TYPE CODE", "P&P COMPONENT STATUS DATE", "OFFENSE QUALIFIER CODE", "LENGTH OF SUPERVISION", "MAXIMUM SENTENCE LENGTH", "SUPERVISION TO FOLLOW INCAR.", "TIME OF LAST UPDATE", "DELEGATED AUTHORITY FLAG", "PRIMARY FELONY/MISDEMEANOR CD.", "SENTENCE TYPE CODE_2", "SENTENCE COMPONENT NUMBER", "DATE OFFENSE COMMITTED - END", "ORIGINAL DATA ENTRY DATE", "COURT TYPE CODE", "OFFENDER NC DOC ID NUMBER", "ORIGINAL SENTENCE AUDIT CODE", "DATE OF LAST UPDATE", "SENTENCING PENALTY CLASS CODE", "NUMBER OF COUNTS", "PUNISHMENT TYPE CODE", "SENTENCE TYPE CODE_1", "INMATE COMPONENT STATUS DATE"]
-  #           hashFunction: "sha256"
-  #         - !<transforms.ValueTransform>
-  #           value: "1"
-  #   name: "resultsin1"
+  resultsin1:
+    fqn: "ol.resultsin"
+    entitySetName: "GuilfordResultsIn"
+    src: "chargeevent"
+    dst: "sentence"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatCombineTransform>
+          transforms:
+          - !<transforms.HashTransform>
+            columns: ["SUPERVISION TERM EXTENSION", "P&P PRIOR COMMITMENT PREFIX", "TYPE OF COUNT CODE", "TIME COMPUTATION EXCEPTION CD.", "INMATE SENTENCE  STATUS CODE", "PRIOR COMPONENT IDENTIFIER", "COURT DOCKET NUMBER", "ICC JAIL CREDITS (IN DAYS)", "DATE OFFENSE COMMITTED - BEGIN", "SENTENCE EFFECTIVE(BEGIN) DATE", "SENTENCE TYPE CODE_4", "COUNTY OF CONVICTION CODE", "SENTENCE CONVICTION DATE", "COMMITMENT PREFIX", "SENTENCE TYPE CODE_3", "SPLIT SENTENCE ACTIVE TERM", "CMP. DISPOSITION CODE (2 OF 2)", "PRIOR COMMITMENT PREFIX", "PRIOR P&P COMMNT/COMPONENT ID", "TIME OF LAST UPDATE TWO", "P&P CASE STATUS", "COMPONENT DISPOSITION CODE", "NC GENERAL STATUTE NUMBER", "SENTENCE TYPE CODE_5", "SENTENCE CHAINING TYPE CODE", "PRIOR RECORD LEVEL CODE", "MINIMUM SENTENCE LENGTH", "SERVING MIN OR MAX TERM CODE", "PRIMARY OFFENSE CODE", "P&P SUPV.TERM CHAIN TYPE CODE", "CREDITS FOR JAIL DAYS SERVED", "DATE OF LAST UPDATE TWO", "PRIOR RCD. POINTS/CONVICTIONS", "G.S. MAXIMUM SENTENCE ALLOWED", "SENTENCE TYPE CODE", "P&P COMPONENT STATUS DATE", "OFFENSE QUALIFIER CODE", "LENGTH OF SUPERVISION", "MAXIMUM SENTENCE LENGTH", "SUPERVISION TO FOLLOW INCAR.", "TIME OF LAST UPDATE", "DELEGATED AUTHORITY FLAG", "PRIMARY FELONY/MISDEMEANOR CD.", "SENTENCE TYPE CODE_2", "SENTENCE COMPONENT NUMBER", "DATE OFFENSE COMMITTED - END", "ORIGINAL DATA ENTRY DATE", "COURT TYPE CODE", "OFFENDER NC DOC ID NUMBER", "ORIGINAL SENTENCE AUDIT CODE", "DATE OF LAST UPDATE", "SENTENCING PENALTY CLASS CODE", "NUMBER OF COUNTS", "PUNISHMENT TYPE CODE", "SENTENCE TYPE CODE_1", "INMATE COMPONENT STATUS DATE"]
+            hashFunction: "sha256"
+          - !<transforms.ValueTransform>
+            value: "1"
+    name: "resultsin1"
 
-  # resultsin2:
-  #   fqn: "ol.resultsin"
-  #   entitySetName: "GuilfordResultsIn"
-  #   src: "offense"
-  #   dst: "chargeevent"
-  #   propertyDefinitions:
-  #     ol.id:
-  #       type: "ol.id"
-  #       transforms:
-  #       - !<transforms.ConcatCombineTransform>
-  #         transforms:
-  #         - !<transforms.HashTransform>
-  #           columns: ["SUPERVISION TERM EXTENSION", "P&P PRIOR COMMITMENT PREFIX", "TYPE OF COUNT CODE", "TIME COMPUTATION EXCEPTION CD.", "INMATE SENTENCE  STATUS CODE", "PRIOR COMPONENT IDENTIFIER", "COURT DOCKET NUMBER", "ICC JAIL CREDITS (IN DAYS)", "DATE OFFENSE COMMITTED - BEGIN", "SENTENCE EFFECTIVE(BEGIN) DATE", "SENTENCE TYPE CODE_4", "COUNTY OF CONVICTION CODE", "SENTENCE CONVICTION DATE", "COMMITMENT PREFIX", "SENTENCE TYPE CODE_3", "SPLIT SENTENCE ACTIVE TERM", "CMP. DISPOSITION CODE (2 OF 2)", "PRIOR COMMITMENT PREFIX", "PRIOR P&P COMMNT/COMPONENT ID", "TIME OF LAST UPDATE TWO", "P&P CASE STATUS", "COMPONENT DISPOSITION CODE", "NC GENERAL STATUTE NUMBER", "SENTENCE TYPE CODE_5", "SENTENCE CHAINING TYPE CODE", "PRIOR RECORD LEVEL CODE", "MINIMUM SENTENCE LENGTH", "SERVING MIN OR MAX TERM CODE", "PRIMARY OFFENSE CODE", "P&P SUPV.TERM CHAIN TYPE CODE", "CREDITS FOR JAIL DAYS SERVED", "DATE OF LAST UPDATE TWO", "PRIOR RCD. POINTS/CONVICTIONS", "G.S. MAXIMUM SENTENCE ALLOWED", "SENTENCE TYPE CODE", "P&P COMPONENT STATUS DATE", "OFFENSE QUALIFIER CODE", "LENGTH OF SUPERVISION", "MAXIMUM SENTENCE LENGTH", "SUPERVISION TO FOLLOW INCAR.", "TIME OF LAST UPDATE", "DELEGATED AUTHORITY FLAG", "PRIMARY FELONY/MISDEMEANOR CD.", "SENTENCE TYPE CODE_2", "SENTENCE COMPONENT NUMBER", "DATE OFFENSE COMMITTED - END", "ORIGINAL DATA ENTRY DATE", "COURT TYPE CODE", "OFFENDER NC DOC ID NUMBER", "ORIGINAL SENTENCE AUDIT CODE", "DATE OF LAST UPDATE", "SENTENCING PENALTY CLASS CODE", "NUMBER OF COUNTS", "PUNISHMENT TYPE CODE", "SENTENCE TYPE CODE_1", "INMATE COMPONENT STATUS DATE"]
-  #           hashFunction: "sha256"
-  #         - !<transforms.ValueTransform>
-  #           value: "2"
-  #   name: "resultsin2"
+  resultsin2:
+    fqn: "ol.resultsin"
+    entitySetName: "GuilfordResultsIn"
+    src: "offense"
+    dst: "chargeevent"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatCombineTransform>
+          transforms:
+          - !<transforms.HashTransform>
+            columns: ["SUPERVISION TERM EXTENSION", "P&P PRIOR COMMITMENT PREFIX", "TYPE OF COUNT CODE", "TIME COMPUTATION EXCEPTION CD.", "INMATE SENTENCE  STATUS CODE", "PRIOR COMPONENT IDENTIFIER", "COURT DOCKET NUMBER", "ICC JAIL CREDITS (IN DAYS)", "DATE OFFENSE COMMITTED - BEGIN", "SENTENCE EFFECTIVE(BEGIN) DATE", "SENTENCE TYPE CODE_4", "COUNTY OF CONVICTION CODE", "SENTENCE CONVICTION DATE", "COMMITMENT PREFIX", "SENTENCE TYPE CODE_3", "SPLIT SENTENCE ACTIVE TERM", "CMP. DISPOSITION CODE (2 OF 2)", "PRIOR COMMITMENT PREFIX", "PRIOR P&P COMMNT/COMPONENT ID", "TIME OF LAST UPDATE TWO", "P&P CASE STATUS", "COMPONENT DISPOSITION CODE", "NC GENERAL STATUTE NUMBER", "SENTENCE TYPE CODE_5", "SENTENCE CHAINING TYPE CODE", "PRIOR RECORD LEVEL CODE", "MINIMUM SENTENCE LENGTH", "SERVING MIN OR MAX TERM CODE", "PRIMARY OFFENSE CODE", "P&P SUPV.TERM CHAIN TYPE CODE", "CREDITS FOR JAIL DAYS SERVED", "DATE OF LAST UPDATE TWO", "PRIOR RCD. POINTS/CONVICTIONS", "G.S. MAXIMUM SENTENCE ALLOWED", "SENTENCE TYPE CODE", "P&P COMPONENT STATUS DATE", "OFFENSE QUALIFIER CODE", "LENGTH OF SUPERVISION", "MAXIMUM SENTENCE LENGTH", "SUPERVISION TO FOLLOW INCAR.", "TIME OF LAST UPDATE", "DELEGATED AUTHORITY FLAG", "PRIMARY FELONY/MISDEMEANOR CD.", "SENTENCE TYPE CODE_2", "SENTENCE COMPONENT NUMBER", "DATE OFFENSE COMMITTED - END", "ORIGINAL DATA ENTRY DATE", "COURT TYPE CODE", "OFFENDER NC DOC ID NUMBER", "ORIGINAL SENTENCE AUDIT CODE", "DATE OF LAST UPDATE", "SENTENCING PENALTY CLASS CODE", "NUMBER OF COUNTS", "PUNISHMENT TYPE CODE", "SENTENCE TYPE CODE_1", "INMATE COMPONENT STATUS DATE"]
+            hashFunction: "sha256"
+          - !<transforms.ValueTransform>
+            value: "2"
+    name: "resultsin2"
 
-  # resultsin3:
-  #   fqn: "ol.resultsin3"
-  #   entitySetName: "GuilfordResultsIn"
-  #   src: "sentence"
-  #   dst: "jailstay"
-  #   propertyDefinitions:
-  #     ol.id:
-  #       type: "ol.id"
-  #       transforms:
-  #       - !<transforms.ConcatCombineTransform>
-  #         transforms:
-  #         - !<transforms.HashTransform>
-  #           columns: ["INMATE SENTENCE  STATUS CODE", "TYPE OF COUNT CODE", "ORIGINAL SENTENCE AUDIT CODE", "SENTENCE TYPE CODE_1", "SENTENCE TYPE CODE", "SENTENCE CONVICTION DATE", "OFFENDER NC DOC ID NUMBER", "SERVING MIN OR MAX TERM CODE"]
-  #           hashFunction: "sha256"
-  #         - !<transforms.ValueTransform>
-  #           value: "3"
-  #   name: "resultsin3"
+  resultsin3:
+    fqn: "ol.resultsin3"
+    entitySetName: "GuilfordResultsIn"
+    src: "sentence"
+    dst: "jailstay"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatCombineTransform>
+          transforms:
+          - !<transforms.HashTransform>
+            columns: ["INMATE SENTENCE  STATUS CODE", "TYPE OF COUNT CODE", "ORIGINAL SENTENCE AUDIT CODE", "SENTENCE TYPE CODE_1", "SENTENCE TYPE CODE", "SENTENCE CONVICTION DATE", "OFFENDER NC DOC ID NUMBER", "SERVING MIN OR MAX TERM CODE"]
+            hashFunction: "sha256"
+          - !<transforms.ValueTransform>
+            value: "3"
+    name: "resultsin3"
 
-  # relatedto:
-  #   fqn: "ol.relatedto"
-  #   entitySetName: "GuilfordRelatedTo"
-  #   src: "charge"
-  #   dst: "case"
-  #   propertyDefinitions:
-  #     ol.id:
-  #       type: "ol.id"
-  #       transforms:
-  #       - !<transforms.ConcatTransform>
-  #         columns: ["OFFENSE QUALIFIER CODE", "SENTENCING PENALTY CLASS CODE", "PRIMARY OFFENSE CODE", "NUMBER OF COUNTS", "NC GENERAL STATUTE NUMBER", "COURT DOCKET NUMBER", "PRIMARY FELONY/MISDEMEANOR CD."]
-  #   name: "relatedto"
+  relatedto:
+    fqn: "ol.relatedto"
+    entitySetName: "GuilfordRelatedTo"
+    src: "charge"
+    dst: "case"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["OFFENSE QUALIFIER CODE", "SENTENCING PENALTY CLASS CODE", "PRIMARY OFFENSE CODE", "NUMBER OF COUNTS", "NC GENERAL STATUTE NUMBER", "COURT DOCKET NUMBER", "PRIMARY FELONY/MISDEMEANOR CD."]
+    name: "relatedto"
 
-  # partof1:
-  #   fqn: "ol.partof"
-  #   entitySetName: "GuilfordPartOf"
-  #   src: "supervision"
-  #   dst: "sentence"
-  #   propertyDefinitions:
-  #     ol.id:
-  #       type: "ol.id"
-  #       transforms:
-  #       - !<transforms.ConcatTransform>
-  #         columns: ["INMATE SENTENCE  STATUS CODE", "SPLIT SENTENCE ACTIVE TERM", "TYPE OF COUNT CODE", "ORIGINAL SENTENCE AUDIT CODE", "SENTENCE TYPE CODE_1", "SENTENCE TYPE CODE", "COMPONENT DISPOSITION CODE", "SENTENCE CONVICTION DATE"]
-  #   name: "partof1"
+  partof1:
+    fqn: "ol.partof"
+    entitySetName: "GuilfordPartOf"
+    src: "supervision"
+    dst: "sentence"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["INMATE SENTENCE  STATUS CODE", "SPLIT SENTENCE ACTIVE TERM", "TYPE OF COUNT CODE", "ORIGINAL SENTENCE AUDIT CODE", "SENTENCE TYPE CODE_1", "SENTENCE TYPE CODE", "COMPONENT DISPOSITION CODE", "SENTENCE CONVICTION DATE"]
+    name: "partof1"
 
-  # partof2:
-  #   fqn: "ol.partof"
-  #   entitySetName: "GuilfordPartOf"
-  #   src: "supervisioncomponent"
-  #   dst: "supervision"
-  #   propertyDefinitions:
-  #     ol.id:
-  #       type: "ol.id"
-  #       transforms:
-  #       - !<transforms.ConcatTransform>
-  #         columns: ["SUPERVISION TERM EXTENSION", "P&P SUPV.TERM CHAIN TYPE CODE", "SUPERVISION TO FOLLOW INCAR.", "LENGTH OF SUPERVISION", "P&P COMPONENT STATUS DATE", "P&P PRIOR COMMITMENT PREFIX"]
-  #   name: "partof2"
+  partof2:
+    fqn: "ol.partof"
+    entitySetName: "GuilfordPartOf"
+    src: "supervisioncomponent"
+    dst: "supervision"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["SUPERVISION TERM EXTENSION", "P&P SUPV.TERM CHAIN TYPE CODE", "SUPERVISION TO FOLLOW INCAR.", "LENGTH OF SUPERVISION", "P&P COMPONENT STATUS DATE", "P&P PRIOR COMMITMENT PREFIX"]
+    name: "partof2"
 
-  # partof3:
-  #   fqn: "ol.partof"
-  #   entitySetName: "GuilfordPartOf"
-  #   src: "sentencecomponent"
-  #   dst: "sentence"
-  #   propertyDefinitions:
-  #     ol.id:
-  #       type: "ol.id"
-  #       transforms:
-  #       - !<transforms.ConcatTransform>
-  #         columns: ["OFFENDER NC DOC ID NUMBER", "INMATE SENTENCE  STATUS CODE", "SPLIT SENTENCE ACTIVE TERM", "TYPE OF COUNT CODE", "ORIGINAL SENTENCE AUDIT CODE", "SENTENCE TYPE CODE_1", "SENTENCE TYPE CODE", "COMPONENT DISPOSITION CODE", "SENTENCE CONVICTION DATE", "INMATE COMPONENT STATUS DATE"]
-  #   name: "partof3"
+  partof3:
+    fqn: "ol.partof"
+    entitySetName: "GuilfordPartOf"
+    src: "sentencecomponent"
+    dst: "sentence"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["OFFENDER NC DOC ID NUMBER", "INMATE SENTENCE  STATUS CODE", "SPLIT SENTENCE ACTIVE TERM", "TYPE OF COUNT CODE", "ORIGINAL SENTENCE AUDIT CODE", "SENTENCE TYPE CODE_1", "SENTENCE TYPE CODE", "COMPONENT DISPOSITION CODE", "SENTENCE CONVICTION DATE", "INMATE COMPONENT STATUS DATE"]
+    name: "partof3"
 
-  # locatedat:
-  #   fqn: "ol.locatedat"
-  #   entitySetName: "GuilfordLocatedAt"
-  #   src: "case"
-  #   dst: "location"
-  #   propertyDefinitions:
-  #     general.id:
-  #       type: "general.id"
-  #       transforms:
-  #       - !<transforms.ConcatTransform>
-  #         columns: ["COUNTY OF CONVICTION CODE", "COURT DOCKET NUMBER"]
-  #   name: "locatedat"
+  locatedat:
+    fqn: "ol.locatedat"
+    entitySetName: "GuilfordLocatedAt"
+    src: "case"
+    dst: "location"
+    propertyDefinitions:
+      general.id:
+        type: "general.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["COUNTY OF CONVICTION CODE", "COURT DOCKET NUMBER"]
+    name: "locatedat"
 
-  # suspectedof:
-  #   fqn: "ol.locatedat"
-  #   entitySetName: "GuilfordSuspectedOf"
-  #   src: "offender"
-  #   dst: "offense"
-  #   propertyDefinitions:
-  #     ol.id:
-  #       type: "ol.id"
-  #       transforms:
-  #       - !<transforms.ConcatTransform>
-  #         columns: ["OFFENDER NC DOC ID NUMBER", "DATE OFFENSE COMMITTED - END", "OFFENSE QUALIFIER CODE", "PRIMARY OFFENSE CODE", "DATE OFFENSE COMMITTED - BEGIN"]
-  #   name: "suspectedof"
+  suspectedof:
+    fqn: "ol.locatedat"
+    entitySetName: "GuilfordSuspectedOf"
+    src: "offender"
+    dst: "offense"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["OFFENDER NC DOC ID NUMBER", "DATE OFFENSE COMMITTED - END", "OFFENSE QUALIFIER CODE", "PRIMARY OFFENSE CODE", "DATE OFFENSE COMMITTED - BEGIN"]
+    name: "suspectedof"
