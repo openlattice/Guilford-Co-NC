@@ -8,10 +8,8 @@ entityDefinitions:
     propertyDefinitions:
       nc.SubjectIdentification:
         type: "nc.SubjectIdentification"
-        transforms:
-        - !<transforms.ConcatTransform>
-          columns: ["COMMITTED FIRST NAME", "COMMITTED MIDDLE NAME", "COMMITTED LAST NAME", "COMMITTED NAME SUFFIX"]
-      nc.PersonSurName:
+        column: "OFFENDER NC DOC ID NUMBER"
+      nc.PersonSurname:
         type: "nc.PersonSurName"
         column: "COMMITTED LAST NAME"
       nc.PersonGivenName:
@@ -26,9 +24,6 @@ entityDefinitions:
           transformsIfFalse:
           - !<transforms.ColumnTransform>
             column: "COMMITTED MIDDLE NAME"
-          transformsIfTrue:
-          - !<transforms.ValueTransform>
-            value: ""
       nc.PersonSuffix:
         type: "nc.PersonSuffix"
         column: "COMMITTED NAME SUFFIX"
@@ -59,20 +54,13 @@ entityDefinitions:
           columns: ["OFFENDER NC DOC ID NUMBER", "EARLIEST SENTENCE EFFECTIVE DT"]
       general.fullname: 
         type: "general.fullname"
-        transforms:
-        - !<transforms.BooleanRegexTransform>
+        transforms: 
+        - !<transforms.ColumnTransform>
           column: "TOTAL SENTENCE LENGTH"
-          pattern: "\\?+"
-          transformsIfFalse:
-          - !<transforms.ColumnTransform>
-            column: "TOTAL SENTENCE LENGTH"
-          - !<transforms.ReplaceTransform>
-            target: ["9999999", "9999998"]
-            goal: ["Death Sentence", "Life Sentence"]
-            valueElse: null
-          transformsIfTrue:
-          - !<transforms.ValueTransform>
-            value: ""
+        - !<transforms.ReplaceTransform>
+          target: ["9999999", "9999998"]
+          goal: ["Death Sentence", "Life Sentence"]
+          valueElse: ""
       ol.effectivedate: #earliest sentence effective dt
         type: "ol.effectivedate"
         column: "EARLIEST SENTENCE EFFECTIVE DT"
@@ -93,16 +81,11 @@ entityDefinitions:
           columns: ["OFFENDER NC DOC ID NUMBER", "COMMITMENT PREFIX"]
       ol.status: # inmate commitment status flag
         type: "ol.status"
-        transforms:
-        - !<transforms.BooleanRegexTransform>
-          column: "INMATE COMMITMENT STATUS FLAG"
-          pattern: "\\?+"
-          transformsIfFalse:
-          - !<transforms.ColumnTransform>
-            column: "INMATE COMMITMENT STATUS FLAG"
-          transformsIfTrue:
-          - !<transforms.ValueTransform>
-            value: ""
+        column: "INMATE COMMITMENT STATUS FLAG"
+        transforms: 
+        - !<transforms.ReplaceRegexTransform>
+          target: "\\?+"
+          goal: ""
       general.datetime: # commitment status date
         type: "general.datetime"
         column: "COMMITMENT STATUS DATE"
@@ -156,28 +139,18 @@ entityDefinitions:
     propertyDefinitions:
       ol.id: # most serious offense code
         type: "ol.id"
-        transforms:
-        - !<transforms.BooleanRegexTransform>
-          column: "MOST SERIOUS OFFENSE CODE"
-          pattern: "\\?+"
-          transformsIfFalse:
-          - !<transforms.ColumnTransform>
-            column: "MOST SERIOUS OFFENSE CODE"
-          transformsIfTrue:
-          - !<transforms.ValueTransform>
-            value: ""
+        column: "MOST SERIOUS OFFENSE CODE"
+        transforms: 
+        - !<transforms.ReplaceRegexTransform>
+          target: "\\?+"
+          goal: ""
       ol.description: # most serious offense code
         type: "ol.description"
-        transforms:
-        - !<transforms.BooleanRegexTransform>
-          column: "MOST SERIOUS OFFENSE CODE"
-          pattern: "\\?+"
-          transformsIfFalse:
-          - !<transforms.ColumnTransform>
-            column: "MOST SERIOUS OFFENSE CODE"
-          transformsIfTrue:
-          - !<transforms.ValueTransform>
-            value: ""
+        column: "MOST SERIOUS OFFENSE CODE"
+        transforms: 
+        - !<transforms.ReplaceRegexTransform>
+          target: "\\?+"
+          goal: ""
     name: "charges"
 
   supervisions:
@@ -188,7 +161,7 @@ entityDefinitions:
         type: "ol.id"
         transforms:
         - !<transforms.ConcatTransform>
-          columns: ["P\  CASE INTAKE DATE", "OFFENDER NC DOC ID NUMBER"]
+          columns: ["P&P CASE INTAKE DATE", "OFFENDER NC DOC ID NUMBER"]
       ol.recognizedstartdate: # p&p commitment status flag
         type: "ol.recognizedstartdate"
         column: "P&P CASE INTAKE DATE"
@@ -198,16 +171,11 @@ entityDefinitions:
           timezone: "America/New_York"
       ol.status: # p&p commitment status flag
         type: "ol.status"
-        transforms:
-        - !<transforms.BooleanRegexTransform>
-          column: "P&P COMMITMENT STATUS FLAG"
-          pattern: "\\?+"
-          transformsIfFalse:
-          - !<transforms.ColumnTransform>
-            column: "P&P COMMITMENT STATUS FLAG"
-          transformsIfTrue:
-          - !<transforms.ValueTransform>
-            value: ""
+        column: "P&P COMMITMENT STATUS FLAG"
+        transforms: 
+        - !<transforms.ReplaceRegexTransform>
+          target: "\\?+"
+          goal: ""
       general.datetime: # p&p commitment status date
         type: "general.datetime"
         column: "P&P COMMITMENT STATUS DATE"
@@ -217,28 +185,18 @@ entityDefinitions:
           timezone: "America/New_York"
       ol.durationdays: # total length of supervision
         type: "ol.durationdays"
-        transforms:
-        - !<transforms.BooleanRegexTransform>
-          column: "TOTAL LENGTH OF SUPERVISION"
-          pattern: "\\?+"
-          transformsIfFalse:
-          - !<transforms.ColumnTransform>
-            column: "TOTAL LENGTH OF SUPERVISION"
-          transformsIfTrue:
-          - !<transforms.ValueTransform>
-            value: ""
+        column: "TOTAL LENGTH OF SUPERVISION"
+        transforms: 
+        - !<transforms.ReplaceRegexTransform>
+          target: "\\?+"
+          goal: ""
       ol.type:
         type: "ol.type"
-        transforms:
-        - !<transforms.BooleanRegexTransform>
-          column: "TYPE OF OLD PE DATE CODE"
-          pattern: "\\?+"
-          transformsIfFalse:
-          - !<transforms.ColumnTransform>
-            column: "TYPE OF OLD PE DATE CODE"
-          transformsIfTrue:
-          - !<transforms.ValueTransform>
-            value: ""
+        column: "TYPE OF OLD PE DATE CODE"
+        transforms: 
+        - !<transforms.ReplaceRegexTransform>
+          target: "\\?+"
+          goal: ""
       ol.newperiod:
         type: "ol.newperiod"
         column: "NEW PERIOD OF SUPERVISION FLAG"
@@ -276,9 +234,8 @@ associationDefinitions:
       ol.id:
         type: "ol.id"
         transforms:
-        - !<transforms.HashTransform>
-          columns: ["COMMITTED FIRST NAME", "COMMITTED MIDDLE NAME", "COMMITTED LAST NAME", "COMMITTED NAME SUFFIX", "OFFENDER NC DOC ID NUMBER", "OFFENDER ADMISSION/INTAKE DATE"]
-          hashFunction: "sha256"
+        - !<transforms.ConcatTransform>
+          columns: ["OFFENDER NC DOC ID NUMBER", "OFFENDER ADMISSION/INTAKE DATE"]
     name: "subjectof"
 
   sentencedwith:
@@ -290,9 +247,12 @@ associationDefinitions:
       ol.id:
         type: "ol.id"
         transforms:
-        - !<transforms.HashTransform>
-          columns: ["COMMITTED FIRST NAME", "COMMITTED MIDDLE NAME", "COMMITTED LAST NAME", "COMMITTED NAME SUFFIX", "OFFENDER NC DOC ID NUMBER", "OFFENDER NC DOC ID NUMBER"]
-          hashFunction: "sha256"
+        - !<transforms.ConcatCombineTransform>
+          transforms:
+          - !<transforms.ColumnTransform>
+            column: "OFFENDER NC DOC ID NUMBER"
+          - !<transforms.ValueTransform>
+            value: "1"
     name: "sentencedwith"
 
   partof:
@@ -304,9 +264,8 @@ associationDefinitions:
       ol.id:
         type: "ol.id"
         transforms:
-        - !<transforms.HashTransform>
+        - !<transforms.ConcatTransform>
           columns: ["COMMITMENT PREFIX", "OFFENDER NC DOC ID NUMBER"]
-          hashFunction: "sha256"
     name: "partof"
 
   partof2:
@@ -318,9 +277,8 @@ associationDefinitions:
       ol.id:
         type: "ol.id"
         transforms:
-        - !<transforms.HashTransform>
+        - !<transforms.ConcatTransform>
           columns: ["COMMITMENT PREFIX", "OFFENDER NC DOC ID NUMBER", "OFFENDER ADMISSION/INTAKE DATE"]
-          hashFunction: "sha256"
     name: "partof2"
 
   subjectof2:
@@ -332,9 +290,8 @@ associationDefinitions:
       ol.id:
         type: "ol.id"
         transforms:
-        - !<transforms.HashTransform>
-          columns: ["COMMITTED FIRST NAME", "COMMITTED MIDDLE NAME", "COMMITTED LAST NAME", "COMMITTED NAME SUFFIX", "OFFENDER NC DOC ID NUMBER", "P&P CASE INTAKE DATE", "OFFENDER NC DOC ID NUMBER"]
-          hashFunction: "sha256"
+        - !<transforms.ConcatTransform>
+          columns: ["OFFENDER NC DOC ID NUMBER", "P&P CASE INTAKE DATE"]
     name: "subjectof2"
 
   chargedwith:
@@ -346,9 +303,13 @@ associationDefinitions:
       ol.id:
         type: "ol.id"
         transforms:
-        - !<transforms.HashTransform>
-          columns: ["COMMITTED FIRST NAME", "COMMITTED MIDDLE NAME", "COMMITTED LAST NAME", "COMMITTED NAME SUFFIX", "OFFENDER NC DOC ID NUMBER", "MOST SERIOUS OFFENSE CODE"]
-          hashFunction: "sha256"
+        - !<transforms.ConcatCombineTransform>
+          transforms:
+          - !<transforms.HashTransform>
+            columns: ["OFFENDER NC DOC ID NUMBER", "MOST SERIOUS OFFENSE CODE"]
+            hashFunction: "sha256"
+          - !<transforms.ValueTransform>
+            value: "1"
     name: "chargedwith"
 
   registeredfor:
@@ -360,9 +321,8 @@ associationDefinitions:
       ol.id:
         type: "ol.id"
         transforms:
-        - !<transforms.HashTransform>
+        - !<transforms.ConcatTransform>
           columns: ["TOTAL JAIL CREDITS (IN DAYS)", "OFFENDER NC DOC ID NUMBER", "OFFENDER ADMISSION/INTAKE DATE"]
-          hashFunction: "sha256"
     name: "registeredfor"
 
   relatedto:
@@ -374,9 +334,8 @@ associationDefinitions:
       ol.id:
         type: "ol.id"
         transforms:
-        - !<transforms.HashTransform>
+        - !<transforms.ConcatTransform>
           columns: ["OFFENDER NC DOC ID NUMBER", "MOST SERIOUS OFFENSE CODE"]
-          hashFunction: "sha256"
     name: "relatedto"
 
   locatedat:
@@ -388,9 +347,8 @@ associationDefinitions:
       general.id:
         type: "general.id"
         transforms:
-        - !<transforms.HashTransform>
+        - !<transforms.ConcatTransform>
           columns: ["CO OF CONV MOST SERIOUS OFFNSE", "OFFENDER NC DOC ID NUMBER"]
-          hashFunction: "sha256"
     name: "locatedat"
 
   oflength:
@@ -402,7 +360,11 @@ associationDefinitions:
       ol.id:
         type: "ol.id"
         transforms:
-        - !<transforms.HashTransform>
-          columns: ["OFFENDER NC DOC ID NUMBER", "EARLIEST SENTENCE EFFECTIVE DT", "OFFENDER NC DOC ID NUMBER"]
-          hashFunction: "sha256"
+        - !<transforms.ConcatCombineTransform>
+          transforms:
+          - !<transforms.HashTransform>
+            columns: ["OFFENDER NC DOC ID NUMBER", "EARLIEST SENTENCE EFFECTIVE DT", "OFFENDER NC DOC ID NUMBER"]
+            hashFunction: "sha256"
+          - !<transforms.ValueTransform>
+            value: "2"
     name: "oflength"
