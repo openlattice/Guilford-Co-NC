@@ -234,8 +234,13 @@ associationDefinitions:
       ol.id:
         type: "ol.id"
         transforms:
-        - !<transforms.ConcatTransform>
-          columns: ["OFFENDER NC DOC ID NUMBER", "OFFENDER ADMISSION/INTAKE DATE"]
+        - !<transforms.ConcatCombineTransform>
+          transforms:
+          - !<transforms.HashTransform>
+            columns: ["OFFENDER NC DOC ID NUMBER", "OFFENDER ADMISSION/INTAKE DATE"]
+            hashFunction: "sha256"
+          - !<transforms.ValueTransform>
+            value: "1"
     name: "subjectof"
 
   sentencedwith:
@@ -325,9 +330,9 @@ associationDefinitions:
           columns: ["TOTAL JAIL CREDITS (IN DAYS)", "OFFENDER NC DOC ID NUMBER", "OFFENDER ADMISSION/INTAKE DATE"]
     name: "registeredfor"
 
-  relatedto:
-    fqn: "ol.relatedto"
-    entitySetName: "GuilfordRelatedTo"
+  resultsin:
+    fqn: "ol.resultsin"
+    entitySetName: "GuilfordResultsIn"
     src: "charges"
     dst: "sentences"
     propertyDefinitions:
@@ -336,7 +341,7 @@ associationDefinitions:
         transforms:
         - !<transforms.ConcatTransform>
           columns: ["OFFENDER NC DOC ID NUMBER", "MOST SERIOUS OFFENSE CODE"]
-    name: "relatedto"
+    name: "resultsin"
 
   locatedat:
     fqn: "ol.locatedat"
