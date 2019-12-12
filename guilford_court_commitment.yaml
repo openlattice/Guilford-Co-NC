@@ -237,7 +237,7 @@ associationDefinitions:
         - !<transforms.ConcatCombineTransform>
           transforms:
           - !<transforms.HashTransform>
-            columns: ["OFFENDER NC DOC ID NUMBER", "OFFENDER ADMISSION/INTAKE DATE"]
+            columns: ["OFFENDER ADMISSION/INTAKE DATE", "OFFENDER NC DOC ID NUMBER"]
             hashFunction: "sha256"
           - !<transforms.ValueTransform>
             value: "1"
