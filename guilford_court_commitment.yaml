@@ -1,0 +1,375 @@
+entityDefinitions:
+
+
+
+  offenders:
+    fqn: "general.person"
+    entitySetName: "GuilfordOffenders"
+    propertyDefinitions:
+      nc.SubjectIdentification:
+        type: "nc.SubjectIdentification"
+        column: "OFFENDER NC DOC ID NUMBER"
+      nc.PersonSurname:
+        type: "nc.PersonSurName"
+        column: "COMMITTED LAST NAME"
+      nc.PersonGivenName:
+        type: "nc.PersonGivenName"
+        column: "COMMITTED FIRST NAME"
+      nc.PersonMiddleName:
+        type: "nc.PersonMiddleName"
+        transforms:
+        - !<transforms.BooleanRegexTransform>
+          column: "COMMITTED MIDDLE NAME"
+          pattern: "None"
+          transformsIfFalse:
+          - !<transforms.ColumnTransform>
+            column: "COMMITTED MIDDLE NAME"
+      nc.PersonSuffix:
+        type: "nc.PersonSuffix"
+        column: "COMMITTED NAME SUFFIX"
+      ol.datasource: # value transform - write nc dps
+        type: "ol.datasource"
+        transforms:
+        - !<transforms.ValueTransform>
+          value: "NC DPS"
+    name: "offenders" 
+
+  sentences:
+    fqn: "ol.sentence"
+    entitySetName: "GuilfordSentences_DPS"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "OFFENDER NC DOC ID NUMBER"
+    name: "sentences"
+
+  sentenceterms:
+    fqn: "ol.sentenceterm"
+    entitySetName: "GuilfordSentenceTerms"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["OFFENDER NC DOC ID NUMBER", "EARLIEST SENTENCE EFFECTIVE DT"]
+      general.fullname: 
+        type: "general.fullname"
+        transforms: 
+        - !<transforms.ColumnTransform>
+          column: "TOTAL SENTENCE LENGTH"
+        - !<transforms.ReplaceTransform>
+          target: ["9999999", "9999998"]
+          goal: ["Death Sentence", "Life Sentence"]
+          valueElse: ""
+      ol.effectivedate: #earliest sentence effective dt
+        type: "ol.effectivedate"
+        column: "EARLIEST SENTENCE EFFECTIVE DT"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss.S"]
+          timezone: "America/New_York"
+    name: "sentenceterms"
+
+  sentencecomponents:
+    fqn: "ol.sentencecomponent"
+    entitySetName: "GuilfordSentenceComponents_DPS"
+    propertyDefinitions:
+      ol.id: # concat offender "nc doc id number", "commitment prefix" 
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["OFFENDER NC DOC ID NUMBER", "COMMITMENT PREFIX"]
+      ol.status: # inmate commitment status flag
+        type: "ol.status"
+        column: "INMATE COMMITMENT STATUS FLAG"
+        transforms: 
+        - !<transforms.ReplaceRegexTransform>
+          target: "\\?+"
+          goal: ""
+      general.datetime: # commitment status date
+        type: "general.datetime"
+        column: "COMMITMENT STATUS DATE"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss.S"]
+          timezone: "America/New_York"
+      ol.commitment: # commitment prefix
+        type: "ol.commitment"
+        column: "COMMITMENT PREFIX"
+    name: "sentencecomponents"
+
+  jailstays:
+    fqn: "ol.jailstay"
+    entitySetName: "GuilfordJailStays_DPS"
+    propertyDefinitions:
+      ol.id: # concat offender "nc doc id number", "offender admission/intake date"
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["OFFENDER NC DOC ID NUMBER", "OFFENDER ADMISSION/INTAKE DATE"]
+      incident.startdatetime: # offender admission/intake date
+        type: "incident.startdatetime"
+        column: "OFFENDER ADMISSION/INTAKE DATE"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss.S"]
+          timezone: "America/New_York"
+    name: "jailstays"
+
+  jailtimemodifications:
+    fqn: "ol.jailtimemodifications"
+    entitySetName: "GuilfordJailTimeCredit"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        column: "TOTAL JAIL CREDITS (IN DAYS)"
+      ol.value: # total jail credit in days
+        type: "ol.value"
+        column: "TOTAL JAIL CREDITS (IN DAYS)"
+      ol.units: # value transform and write in days
+        type: "ol.units"
+        transforms:
+        - !<transforms.ValueTransform>
+          value: "Days"
+    name: "jailtimemodifications"
+
+  charges:
+    fqn: "ol.charge"
+    entitySetName: "GuilfordCharges"
+    propertyDefinitions:
+      ol.id: # most serious offense code
+        type: "ol.id"
+        column: "MOST SERIOUS OFFENSE CODE"
+        transforms: 
+        - !<transforms.ReplaceRegexTransform>
+          target: "\\?+"
+          goal: ""
+      ol.description: # most serious offense code
+        type: "ol.description"
+        column: "MOST SERIOUS OFFENSE CODE"
+        transforms: 
+        - !<transforms.ReplaceRegexTransform>
+          target: "\\?+"
+          goal: ""
+    name: "charges"
+
+  supervisions:
+    fqn: "ol.supervision"
+    entitySetName: "GuilfordSupervisions"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["P&P CASE INTAKE DATE", "OFFENDER NC DOC ID NUMBER"]
+      ol.recognizedstartdate: # p&p commitment status flag
+        type: "ol.recognizedstartdate"
+        column: "P&P CASE INTAKE DATE"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss.S"]
+          timezone: "America/New_York"
+      ol.status: # p&p commitment status flag
+        type: "ol.status"
+        column: "P&P COMMITMENT STATUS FLAG"
+        transforms: 
+        - !<transforms.ReplaceRegexTransform>
+          target: "\\?+"
+          goal: ""
+      general.datetime: # p&p commitment status date
+        type: "general.datetime"
+        column: "P&P COMMITMENT STATUS DATE"
+        transforms:
+        - !<transforms.DateTimeTransform>
+          pattern: ["yyyy-MM-dd HH:mm:ss.S"]
+          timezone: "America/New_York"
+      ol.durationdays: # total length of supervision
+        type: "ol.durationdays"
+        column: "TOTAL LENGTH OF SUPERVISION"
+        transforms: 
+        - !<transforms.ReplaceRegexTransform>
+          target: "\\?+"
+          goal: ""
+      ol.type:
+        type: "ol.type"
+        column: "TYPE OF OLD PE DATE CODE"
+        transforms: 
+        - !<transforms.ReplaceRegexTransform>
+          target: "\\?+"
+          goal: ""
+      ol.newperiod:
+        type: "ol.newperiod"
+        column: "NEW PERIOD OF SUPERVISION FLAG"
+    name: "supervisions"
+
+  locations:
+    fqn: "ol.location"
+    entitySetName: "GuilfordLocations"
+    propertyDefinitions:
+      general.id: # most serious offense code
+        type: "general.id"
+        column: "CO OF CONV MOST SERIOUS OFFNSE"
+      ol.county: # county of most serious offense
+        type: "ol.county"
+        column: "CO OF CONV MOST SERIOUS OFFNSE"
+    conditions:
+    - !<conditions.BooleanRegexCondition>
+      column: "CO OF CONV MOST SERIOUS OFFNSE"
+      pattern: "\\?+"
+      reverse: true
+    name: "locations"
+
+
+
+associationDefinitions:
+ 
+
+
+  subjectof:
+    fqn: "ol.subjectof"
+    entitySetName: "GuilfordSubjectOf"
+    src: "offenders"
+    dst: "jailstays"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatCombineTransform>
+          transforms:
+          - !<transforms.HashTransform>
+            columns: ["OFFENDER ADMISSION/INTAKE DATE", "OFFENDER NC DOC ID NUMBER"]
+            hashFunction: "sha256"
+          - !<transforms.ValueTransform>
+            value: "1"
+    name: "subjectof"
+
+  sentencedwith:
+    fqn: "ol.sentencedwith"
+    entitySetName: "GuilfordSentencedWith"
+    src: "offenders"
+    dst: "sentences"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatCombineTransform>
+          transforms:
+          - !<transforms.ColumnTransform>
+            column: "OFFENDER NC DOC ID NUMBER"
+          - !<transforms.ValueTransform>
+            value: "1"
+    name: "sentencedwith"
+
+  partof:
+    fqn: "ol.partof"
+    entitySetName: "GuilfordPartOf"
+    src: "sentencecomponents"
+    dst: "sentences"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["COMMITMENT PREFIX", "OFFENDER NC DOC ID NUMBER"]
+    name: "partof"
+
+  partof2:
+    fqn: "ol.partof"
+    entitySetName: "GuilfordPartOf"
+    src: "sentencecomponents"
+    dst: "jailstays"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["COMMITMENT PREFIX", "OFFENDER NC DOC ID NUMBER", "OFFENDER ADMISSION/INTAKE DATE"]
+    name: "partof2"
+
+  subjectof2:
+    fqn: "ol.subjectof"
+    entitySetName: "GuilfordSubjectOf"
+    src: "offenders"
+    dst: "supervisions"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["OFFENDER NC DOC ID NUMBER", "P&P CASE INTAKE DATE"]
+    name: "subjectof2"
+
+  chargedwith:
+    fqn: "ol.chargedwith"
+    entitySetName: "GuilfordChargedWith"
+    src: "offenders"
+    dst: "charges"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatCombineTransform>
+          transforms:
+          - !<transforms.HashTransform>
+            columns: ["OFFENDER NC DOC ID NUMBER", "MOST SERIOUS OFFENSE CODE"]
+            hashFunction: "sha256"
+          - !<transforms.ValueTransform>
+            value: "1"
+    name: "chargedwith"
+
+  registeredfor:
+    fqn: "general.registeredfor"
+    entitySetName: "GuilfordRegisteredFor"
+    src: "jailtimemodifications"
+    dst: "jailstays"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["TOTAL JAIL CREDITS (IN DAYS)", "OFFENDER NC DOC ID NUMBER", "OFFENDER ADMISSION/INTAKE DATE"]
+    name: "registeredfor"
+
+  resultsin:
+    fqn: "ol.resultsin"
+    entitySetName: "GuilfordResultsIn"
+    src: "charges"
+    dst: "sentences"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["OFFENDER NC DOC ID NUMBER", "MOST SERIOUS OFFENSE CODE"]
+    name: "resultsin"
+
+  locatedat:
+    fqn: "ol.locatedat"
+    entitySetName: "GuilfordLocatedAt"
+    src: "sentences"
+    dst: "locations"
+    propertyDefinitions:
+      general.id:
+        type: "general.id"
+        transforms:
+        - !<transforms.ConcatTransform>
+          columns: ["CO OF CONV MOST SERIOUS OFFNSE", "OFFENDER NC DOC ID NUMBER"]
+    name: "locatedat"
+
+  oflength:
+    fqn: "ol.oflength"
+    entitySetName: "GuilfordOfLength"
+    src: "sentences"
+    dst: "sentenceterms"
+    propertyDefinitions:
+      ol.id:
+        type: "ol.id"
+        transforms:
+        - !<transforms.ConcatCombineTransform>
+          transforms:
+          - !<transforms.HashTransform>
+            columns: ["OFFENDER NC DOC ID NUMBER", "EARLIEST SENTENCE EFFECTIVE DT", "OFFENDER NC DOC ID NUMBER"]
+            hashFunction: "sha256"
+          - !<transforms.ValueTransform>
+            value: "2"
+    name: "oflength"
